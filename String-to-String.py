@@ -6,7 +6,7 @@ class Square:
     def __init__(self):
         print('test')
 
-#Funkcja problem która nic nie robi póki co
+#Funkcja problem która wstawia w losowe miejsca niewiadome.
 def problem(i):
     while i > 0:
         x = random.randint(0,len(points_v2)-1)
@@ -16,14 +16,16 @@ def problem(i):
         points_transposed = list(map(list, points_v2))
         i = i - 1
 
+#Funkcja rozwiązania która próbuje z problemu osiągnąć stan na wejściu
 def solution_v2():
 
+    #Booleany które potem przydają sięprzy sprawdzaniu czy wystąpił błąd przy wypełnieniu list.
     Status_transposed_boolean = False
     Status_normal_boolean = False
 
     for points in points_v2:
         for point in points:
-            #Jeżeli element to x to sprawdzam jaki jest rozmiar listy i pętlą for sprawdzam ile dana liczba razy wystąpiła 
+            #Jeżeli element to string to sprawdzam jaki jest rozmiar listy i pętlą for sprawdzam ile dana liczba razy wystąpiła 
             # i jeśli jedna liczba nie wystąpiła to jest ona tą zmienną.
             if(type(point) is str):
                 elements = len(points)
@@ -65,10 +67,10 @@ def solution_v2():
         print('Correct outcome: ', points_v2_normal)
     elif((Status_transposed_boolean != True) and Status_normal_boolean == True):
         print('Correct outcome: ', points_v2_transposed_reversed)
-    elif((Status_transposed_boolean == True) and Status_normal_boolean == True):
+    elif((Status_transposed_boolean == False) and Status_normal_boolean == False):
         print('Correct outcome: ', points_v2_normal)
     else:
-        print("The answer isn't here")
+        print("The answer isn't here or try manual input")
 
 #Funkcja która nic nie robi póki co
 def solution_t():
@@ -86,7 +88,7 @@ possible_elements_transposed = []
 set_normal = set(possible_elements_normal)
 set_transposed = set(possible_elements_transposed)
 
-#Listy z niekompletnym rozwiązaniem, rozwiązaniem po transpozycji oraz liczbą elementów w liście
+#Listy z danymi wejściowymi, danymi po transpozycji oraz liczbą elementów w liście
 points_v2 = [[2, 1, 3],[3, 2, 1],[1, 3, 2]]
 
 points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2])))
