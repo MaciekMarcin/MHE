@@ -17,4 +17,4 @@ Program pierw uzupełnia każdą listę która jest w pozycji początkowej po cz
 |-|-|-
 |2|b|d
 
-Jeżeli nie ma dwóch takich samych wartości w żadnej liście to jest ona uzupełniona poprawnie. Taką samą procedurę wykonuje, ale w drugą stronę gdyż najczęściej tylko 1 z 2 tych opcji działa bez pomyłek.
+Jeżeli nie ma dwóch takich samych wartości w żadnej liście to jest ona uzupełniona poprawnie. Taką samą procedurę wykonuje, ale w drugą stronę gdyż najczęściej tylko 1 z 2 tych opcji działa bez pomyłek. W przeciwnym wypadku jakość rozwiązania które nie byłoby idealne może być mierzone poprzez sprawdzenie ile pozycji, które zostały zastąpione niewiadomymi, zgadza się z oryginalną tabelą na wejściu.
