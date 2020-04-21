@@ -2,19 +2,27 @@ import random
 import math
 
 #Klasa obiektu Cube które nic nie robi póki co
-class Square:
-    def __init__(self):
-        print('test')
+#class Square:
+#    def __init__(self):
+#        print('test')
+Square_array = []
+def Square(i):
+    for i in range(1,i):
+        for j in range(1,i):
+            Square_array.append()
+
 
 #Funkcja problem która wstawia w losowe miejsca niewiadome.
 def problem(i):
     while i > 0:
         x = random.randint(0,len(points_v2)-1)
         y = random.randint(0,len(points_v2)-1)
-        points_v2[x][y] = 'x'
-        print('Generated problem: ', *points_v2,sep='\n',end='\n\n')
-        points_transposed = list(map(list, points_v2))
-        i = i - 1
+        if(points_v2[x][y] == 'x'):
+            continue
+        else:
+            points_v2[x][y] = 'x'
+            i = i - 1
+    print('Generated problem: ', *points_v2,sep='\n',end='\n\n')
 
 #Funkcja rozwiązania która próbuje z problemu osiągnąć stan na wejściu
 def solution_v2():
@@ -36,14 +44,6 @@ def solution_v2():
                         possible_elements_normal.append(element)
                         new_points_normal.append(element)
 
-    points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
-    print('Normal: ', points_v2_normal, sep='\n', end='\n\n')
-    for points in points_v2_normal_reversed:
-        for point in points:
-            if(points.count(point) > 1):
-                print('Error', point)
-                Status_normal_boolean = True
-
     for points in points_transposed:
         for point in points:
             if(type(point) is str):
@@ -55,21 +55,45 @@ def solution_v2():
                         possible_elements_transposed.append(element_transposed)
                         new_points_transposed.append(element_transposed)
 
+    points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
     points_v2_transposed_reversed = list(map(list, zip(points_v2_transposed[0],points_v2_transposed[1],points_v2_transposed[2])))
-    print('Transposed: ', points_v2_transposed, sep='\n', end='\n\n')    
+
+    #Dla normal
+    print('Normal: ', *points_v2_normal, sep='\n', end='\n\n')
+    for points in points_v2_normal_reversed:
+        for point in points:
+            if(points.count(point) > 1):
+                print('Error', point)
+                Status_normal_boolean = True
+                #print(points_v2_normal_reversed.index(points))
+                #point = 'x'
+                #print(points_v2_normal_reversed)
+                #solution_v2()
+    #print(*points_v2_normal_reversed, sep='\n', end='\n\n')
+
+    #Dla transposed
+    print('Transposed: ', *points_v2_transposed, sep='\n', end='\n\n')    
     for points in points_v2_transposed_reversed:
         for point in points:
             if(points.count(point) > 1):
                 print('Error', point)
                 Status_transposed_boolean = True
+                #point = 'x'
+                #print(points_v2_transposed_reversed)
+                #solution_v2
+    #print(*points_v2_transposed_reversed, sep='\n', end='\n\n')
 
     if((Status_transposed_boolean == True) and Status_normal_boolean != True):
-        print('Correct outcome: ', points_v2_normal)
+        print('Correct outcome normal: ', *points_v2_normal, sep='\n', end='\n\n')
     elif((Status_transposed_boolean != True) and Status_normal_boolean == True):
-        print('Correct outcome: ', points_v2_transposed_reversed)
+        print('Correct outcome transposed: ', *points_v2_transposed_reversed, sep='\n', end='\n\n')
     elif((Status_transposed_boolean == False) and Status_normal_boolean == False):
-        print('Correct outcome: ', points_v2_normal)
+        print('Correct outcome both: ', *points_v2_transposed_reversed, sep='\n', end='\n\n')
     else:
+        print(*points_v2_normal_reversed, sep='\n', end='\n\n')
+        print(*points_v2_transposed, sep='\n', end='\n\n')
+        print(*points_v2_transposed_reversed, sep='\n', end='\n\n')
+        print(*points_v2_normal, sep='\n', end='\n\n')
         print("The answer isn't here or try manual input")
 
 #Funkcja która nic nie robi póki co
@@ -90,13 +114,22 @@ set_transposed = set(possible_elements_transposed)
 
 #Listy z danymi wejściowymi, danymi po transpozycji oraz liczbą elementów w liście
 points_v2 = [[2, 1, 3],[3, 2, 1],[1, 3, 2]]
+#points_v2 = [[1,2,3,4,5,6,7,8],[2,3,4,5,6,7,8,1],[3,4,5,6,7,8,1,2],[4,5,6,7,8,1,2,3],[5,6,7,8,1,2,3,4],[6,7,8,1,2,3,4,5],[7,8,1,2,3,4,5,6],[8,1,2,3,4,5,6,7]]
+
+#points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2],points_v2[3],points_v2[4],points_v2[5],points_v2[6],points_v2[7])))
+
+
+#Kopia listy do ocenienia jakości oraz kopia listy z niewiadomymi oraz kopia listy po transpozycji
+#points_v2_normal = points_v2
+#points_v2_transposed = points_transposed
+
+#Wywołanie funkcji
+
+problem(6)
 
 points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2])))
 amount_of_elements = len(points_v2)*len(points_v2)
-
 points_v2_normal = points_v2
 points_v2_transposed = points_transposed
 
-#Wywołanie funkcji
-problem(3)
 solution_v2()
