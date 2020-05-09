@@ -18,3 +18,11 @@ Program pierw uzupełnia każdą listę która jest w pozycji początkowej po cz
 |2|b|d
 
 Jeżeli nie ma dwóch takich samych wartości w żadnej liście to jest ona uzupełniona poprawnie. Taką samą procedurę wykonuje, ale w drugą stronę gdyż najczęściej tylko 1 z 2 tych opcji działa bez pomyłek. W przeciwnym wypadku jakość rozwiązania które nie byłoby idealne może być mierzone poprzez sprawdzenie ile pozycji, które zostały zastąpione niewiadomymi, zgadza się z oryginalną tabelą na wejściu.
+
+Dla uproszczenia program działła tylko na kwadratach 3x3. Większe byłyby może i możliwe gdyby nie transpozycja na którą ciężko znaleść inną metodę, póki co może działać i na większą liczbę niż 3x3, ale polega to na dokładaniu dodatkowego parametru/linii kodu w kilku/kilkunastu miejscach, ale generalnie sam koncept i wykonanie wygląda dalej tak samo.
+
+Brutefore polega na sprawdzeniu innych pozycji na liście i tych które są w liscie pionowej aby upewnić się czy aby napewno ten element wstawić.
+
+Rezultaty są nawet eksportowane do excela i tam są one dopieszczane.
+
+
