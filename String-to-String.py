@@ -111,7 +111,7 @@ def solution_t(points_v2_normal,problem_amount):
             if(points.count(point) == 1):
                 i = i + 1
             else:
-                i = i + (1/2)
+                i = i #+ (1/2)
     points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
     for points in points_v2_normal_reversed:
         for point in points:
@@ -119,8 +119,9 @@ def solution_t(points_v2_normal,problem_amount):
             if(points.count(point) == 1):
                 j = j + 1
             else:
-                j = j + (1/2)
-
+                j = j #+ (1/2)
+    print(i)
+    print(j)
     score = i + j
     score = round((i + j)/(amount_of_elements*2),2)*100
     print(score,'%',sep='')
@@ -161,9 +162,10 @@ problem_amount = 0
 solution_amount = 0
 points_v2 = [[1,2,3],[2,3,1],[3,1,2]]
 points_from_txt = []
-points_for_excel = []
 columns_table = ['G','H','I']
+columns_table_trouble = ['K','L','M']
 rows_table = [5,6,7]
+
 
 #points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2])))
 amount_of_elements = len(points_v2)*len(points_v2)
@@ -193,18 +195,44 @@ def trial(trial_amount, problem_amount):
     ws1['A1'] = 'ID'
     ws1['B1'] = 'SCORE'
     ws1['C1'] = 'TIME'
+    ws1['D1'] = 'VARIABLES'
     ws1.column_dimensions['A'].width = 20
     ws1.column_dimensions['B'].width = 20
     ws1.column_dimensions['C'].width = 20
+    ws1.column_dimensions['D'].width = 20
     ws1.cell(1, 1).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
     ws1.cell(1, 2).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
     ws1.cell(1, 3).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws = wb.create_sheet("Result")
+    ws['A1'] = 'ID'
+    ws['B1'] = 'SCORE'
+    ws['C1'] = 'TIME'
+    ws['D1'] = 'VARIABLES'
     
     for each in range(0, trial_amount):
-        ws = wb.create_sheet("Result ", each)
+        #ws = wb.create_sheet("Result ", each)
         before = datetime.now()
         points_v2_normal = points_v2
         problem(problem_amount,points_v2_normal)
+        #points_v2_problem_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
+        points_for_excel = []
+        points_for_excel_trouble = []
+
+        ###########Problem function to excel###################
+
+        for points in points_v2_normal:
+            for point in points:
+                points_for_excel_trouble.append(point)
+        pointer = 0
+        for each_r in rows_table:
+            for each_c in columns_table_trouble:
+                ws[str(each_c) + str(each_r + (each*7))] = points_for_excel_trouble[pointer]
+                pointer = pointer + 1
+        print(points_for_excel_trouble)
+        print(points_v2_normal)
+        print('HERE')
+
+        #######################################################
         for row in points_v2_normal:
             text_file.write(str(row) + '\n')
         text_file.write('\n')
@@ -217,25 +245,35 @@ def trial(trial_amount, problem_amount):
             interval_sum = interval
         else:
             interval_sum = interval_sum + interval
-        text_file.write('Latin square: \n')
+        text_file.write('Latin square: \n' + str(each + 1))
         for row in points_v2_normal:
             text_file.write(str(row) + '\n')
         text_file.write('\n')
         ws1['A' + str(i + 1)] = i
         ws1['B' + str(i + 1)] = str(score) + '%'
         ws1['C' + str(i + 1)] = str(interval)
+        ws1['D' + str(i + 1)] = str(problem_amount)
+        
+        ws['A' + str(2 + (each*7))] = i
+        ws['B' + str(2 + (each*7))] = str(score) + '%'
+        ws['C' + str(2 + (each*7))] = str(interval)
+        ws['D' + str(2 + (each*7))] = str(problem_amount)
         ws.column_dimensions['A'].width = 20
         ws.column_dimensions['B'].width = 20
         ws.column_dimensions['C'].width = 20
+        ws.column_dimensions['D'].width = 20
         ws.column_dimensions['G'].width = 20
         ws.column_dimensions['H'].width = 20
         ws.column_dimensions['I'].width = 20
+        ws.column_dimensions['K'].width = 20
+        ws.column_dimensions['L'].width = 20
+        ws.column_dimensions['M'].width = 20
 
-        ws.row_dimensions[5].height = 80
-        ws.row_dimensions[6].height = 80
-        ws.row_dimensions[7].height = 80
-        rows = range(5,8)
-        columns = range(7,10)
+        ws.row_dimensions[5+(7*each)].height = 80
+        ws.row_dimensions[6+(7*each)].height = 80
+        ws.row_dimensions[7+(7*each)].height = 80
+        rows = range(5+(7*each),8+(7*each))
+        columns = range(7,14)
         for row in rows:
             for col in columns:
                 ws.cell(row, col).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
@@ -243,15 +281,22 @@ def trial(trial_amount, problem_amount):
             for point in points:
                 points_for_excel.append(point)
         pointer = 0
-        for each_c in columns_table:
-            for each_r in rows_table:
-                ws[str(each_c) + str(each_r)] = points_for_excel[pointer]
+        for each_r in rows_table:
+            for each_c in columns_table:
+                ws[str(each_c) + str(each_r + (each*7))] = points_for_excel[pointer]
                 pointer = pointer + 1
-        ws.conditional_formatting.add('G5:I7',ColorScaleRule(start_type='percentile', start_value=10, start_color='AA0000',mid_type='percentile', mid_value=50, mid_color='F7A311',end_type='percentile', end_value=90, end_color='00AA00'))
+        format_range = 'G' + str(5+(7*each)) + ':I' + str(7+(7*each))
+        format_range_trouble = 'K' + str(5+(7*each)) + ':M' + str(7+(7*each))
+        ws.conditional_formatting.add(format_range,ColorScaleRule(start_type='percentile', start_value=10, start_color='AA0000',mid_type='percentile', mid_value=50, mid_color='F7A311',end_type='percentile', end_value=90, end_color='00AA00'))
+        ws.conditional_formatting.add(format_range_trouble,ColorScaleRule(start_type='percentile', start_value=10, start_color='AA0000',mid_type='percentile', mid_value=50, mid_color='F7A311',end_type='percentile', end_value=90, end_color='00AA00'))
+        ws.column_dimensions['E'].hidden = True
+        ws.column_dimensions['F'].hidden = True
         print(interval)
         print(i)
         i = i + 1
         print(points_v2)
+        points_for_excel = []
+        points_for_excel_trouble = []
     text_file.write('Total time: ' + str(interval_sum) + '\nScore: ' + str(score) + '%\n\n')
     text_file.close()
     print(interval_sum)
