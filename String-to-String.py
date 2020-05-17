@@ -1,20 +1,14 @@
 import random
 import math
 from datetime import datetime
-from openpyxl import Workbook
-from openpyxl.styles import Alignment, Color, PatternFill, Font, Border
-from openpyxl.styles.differential import DifferentialStyle
-from openpyxl.formatting.rule import ColorScaleRule, CellIsRule, FormulaRule
+import numpy as np
+from itertools import combinations
 
-#Klasa obiektu Cube które nic nie robi póki co
-#class Square:
-#    def __init__(self):
-#        print('test')
-Square_array = []
-def Square(i):
-    for i in range(1,i):
-        for j in range(1,i):
-            Square_array.append()
+#Utowrzenie latin square
+def create_square(size: int):
+    row = [i for i in range(1, size+1)]
+    #print(row)
+    return [row[i:] + row[:i] for i in range(size)]
 
 
 #Funkcja problem która wstawia w losowe miejsca niewiadome.
@@ -29,79 +23,94 @@ def problem(i,points_v2_normal):
             i = i - 1
     print('Generated problem: ', *points_v2_normal,sep='\n',end='\n\n')
 
+def get_rid_of_strings(points_v2_wo_strings):
+    global wo_strings 
+    points_v2_wo_strings = [[int(i) if i.isdigit() else i for i in j] for j in points_v2_wo_strings]
+    #print(points_v2_wo_strings)
+    wo_strings = points_v2_wo_strings
+    return wo_strings
+
+
 #Funkcja rozwiązania która próbuje z problemu osiągnąć stan na wejściu
 def solution_v2(points_v2_normal):
-
+    #print(points_v2_normal)
+    outcome = []
+    whole_row_in_x_counter = 0
     for points in points_v2_normal:
-        for point in points:
-            #Jeżeli element to string to sprawdzam jaki jest rozmiar listy i pętlą for sprawdzam ile dana liczba razy wystąpiła 
-            # i jeśli jedna liczba nie wystąpiła to jest ona tą zmienną.
-            if(type(point) is str):
-                elements = len(points)
-                for element in range(1,int(elements)+1):
-                    if(points.count(element) < 1):
-                        try:
-                            #print(str(element) + ' is a x')
-                            if((points_v2_normal[(points_v2.index(points)+1)%3][points.index(point)] == element) or (points_v2_normal[(points_v2.index(points)+2)%3][points.index(point)] == element)):
-                                if(((element + 1)%4) == 0):
-                                    points_v2_normal[points_v2.index(points)][points.index(point)] = 1
-                                else:
-                                    if((points_v2_normal[(points_v2.index(points)+1)%3][points.index(point)] == element + 1) or (points_v2_normal[(points_v2.index(points)+2)%3][points.index(point)] == element + 1)):
-                                        if(((element + 1)%4) == 0):
-                                            points_v2_normal[points_v2.index(points)][points.index(point)] = 1
-                                        elif(element + 2 == 4):
-                                            points_v2_normal[points_v2.index(points)][points.index(point)] = 1
-                                        else:
-                                            points_v2_normal[points_v2.index(points)][points.index(point)] = (element + 2)
-                                    else:
-                                        points_v2_normal[points_v2.index(points)][points.index(point)] = (element + 1)
-                            else:
-                                points_v2_normal[points_v2.index(points)][points.index(point)] = element
-                            #possible_elements_normal.append(element)
-                            #new_points_normal.append(element)
-                        except ValueError:
-                            print('VALUE ERROR, RETRYING...')
-                            continue
+        check_for_x = points.count('x')
+        i = 0
+        #print(points)
+        if(check_for_x == 0):
+            #for row in outcome:
+            #    if(set(points).issubset(set(row))):
+            #        break
+            #    else:
+            #        i = i + 1
+            #print(i)
+            #print(size)
+            #if(i == size):
+            outcome.append(points)
+        elif(check_for_x == size):
+            #for row in outcome:
+            #    if(set(points).issubset(set(row))):
+            #        break
+            #    else:
+            #        i = i + 1
+            #print(i)
+            #print(size)
+            #if(i == size):
+            whole_row_in_x_counter = whole_row_in_x_counter + 1
+            outcome.append(points)
+        else:
+            Highest_similarity = 0
+            elements = len(points)
+            x = []
+            for each in range(1,size+1):
+                x.append(each)
+            for each in range(0,size):
+                if(check_for_x == 0):
+                    break
+                rotate_list = x
+                rotate_list = rotate_list[each:] + rotate_list[:each]
+                #print(rotate_list)
+                Common_elements = [i for i, j in zip(rotate_list, points) if i == j]
+                similarity = len(Common_elements)/size
+                #print(similarity)
+                if(similarity > Highest_similarity):
+                    outcome.append(rotate_list)
+                #elif(points.count('x') < 1):
+                #    outcome.append(points)
+                #print(points)
+                #print('--------------------------------')
+    print('OUTCOME')
+    print(outcome)
+    print(whole_row_in_x_counter)
+    #print(points_v2_normal)
+    if(whole_row_in_x_counter > 0):
+        outcome = np.transpose(outcome)
+        outcome = outcome.tolist()
+        outcome_wo_strings = get_rid_of_strings(outcome)
+        print('outcome_solution')
+        print(outcome_wo_strings)
+        return solution_v2(outcome_wo_strings)
+        #print('TRANSPOSITION TIME')
+    if(whole_row_in_x_counter == 0):
+        #outcome_final = outcome
+        print('Final outcome')
+        print(outcome)
+        result = outcome
+        return result
 
-
-#    for points in points_transposed:
-#        for point in points:
-#            if(type(point) is str):
-#                elements_transposed = len(points)
-#                for element_transposed in range(1,int(elements_transposed)+1):
-#                    if(points.count(element_transposed) < 1):
-#                        print(str(element_transposed) + ' is a x')
-#                        points_v2_transposed[points_transposed.index(points)][points.index(point)] = element_transposed
-#                        #possible_elements_transposed.append(element_transposed)
-#                        #new_points_transposed.append(element_transposed)
 
     #Dla normal
-    print('Normal: ', *points_v2_normal, sep='\n', end='\n\n')
-    #for points in points_v2_normal_reversed:
-    #    for point in points:
-    #        if(points.count(point) > 1):
-    #            print('Error', point)
-    #            Status_normal_boolean = True
-                #print(points_v2_normal_reversed.index(points))
-                #point = 'x'
-                #print(points_v2_normal_reversed)
-                #solution_v2()
+    #print('Normal: ', *solution, sep='\n', end='\n\n')
     #print(*points_v2_normal_reversed, sep='\n', end='\n\n')
-    points_v2_transposed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
-    #Dla transposed
-    #print('Transposed: ', *points_v2_transposed, sep='\n', end='\n\n')    
-    #for points in points_v2_transposed_reversed:
-    #    for point in points:
-    #        if(points.count(point) > 1):
-    #            print('Error', point)
-    #            Status_transposed_boolean = True
-                #point = 'x'
-                #print(points_v2_transposed_reversed)
-                #solution_v2
-    #print(*points_v2_transposed_reversed, sep='\n', end='\n\n')
+    #points_v2_transposed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
+def format_outcome(outcome):
+    solution = solution_v2(outcome)
+    print(*outcome, sep='\n', end='\n\n')
 
 
-#Funkcja która nic nie robi póki co
 def solution_t(points_v2_normal,problem_amount):
     i = 0
     j = 0
@@ -112,8 +121,9 @@ def solution_t(points_v2_normal,problem_amount):
                 i = i + 1
             else:
                 i = i #+ (1/2)
-    points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
-    for points in points_v2_normal_reversed:
+    points_v2_transposed = np.transpose(points_v2_normal)
+    points_v2_transposed = points_v2_transposed.tolist()
+    for points in points_v2_transposed:
         for point in points:
             elements = len(points)
             if(points.count(point) == 1):
@@ -128,7 +138,8 @@ def solution_t(points_v2_normal,problem_amount):
     return score
 
 def load_from_file():
-    text_file_source = open('Source.txt', 'r')
+    text_file_source = open('Source.txt', 'r').read().replace('\n','')
+    #data = open('Source.txt', 'r').read().replace('\n','')
     for line in text_file_source:
         stripped_line = line.strip()
         line_list = stripped_line.split()
@@ -140,104 +151,42 @@ def load_from_file():
 new_points_normal = []
 new_points_transposed = []
 
-#Listy z możliwymi liczbami które można podstawić za zmienną
-possible_elements_normal = []
-possible_elements_transposed = []
 
-#Tworzenie setów do porównywania czy jeden zbiór jest podzbiorem drugiego
-set_normal = set(possible_elements_normal)
-set_transposed = set(possible_elements_transposed)
-
-#Listy z danymi wejściowymi, danymi po transpozycji oraz liczbą elementów w liście
-#points_v2 = [[2, 1, 3],[3, 2, 1],[1, 3, 2]]
-#points_v2 = [[1,2,3,4,5,6,7,8],[2,3,4,5,6,7,8,1],[3,4,5,6,7,8,1,2],[4,5,6,7,8,1,2,3],[5,6,7,8,1,2,3,4],[6,7,8,1,2,3,4,5],[7,8,1,2,3,4,5,6],[8,1,2,3,4,5,6,7]]
-
-#points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2],points_v2[3],points_v2[4],points_v2[5],points_v2[6],points_v2[7])))
-
-
-#Kopia listy do ocenienia jakości oraz kopia listy z niewiadomymi oraz kopia listy po transpozycji
-
-#Wywołanie funkcji
 problem_amount = 0
 solution_amount = 0
-points_v2 = [[1,2,3],[2,3,1],[3,1,2]]
-points_from_txt = []
-columns_table = ['G','H','I']
-columns_table_trouble = ['K','L','M']
-rows_table = [5,6,7]
-
-
-#points_transposed = list(map(list, zip(points_v2[0],points_v2[1],points_v2[2])))
-amount_of_elements = len(points_v2)*len(points_v2)
-#points_v2_normal = points_v2
-#points_v2_transposed = points_transposed
-
-#solution_v2()
-#points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
-#solution_t()
-#after = datetime.now()
-
 trial_amount = int(input('How many test cases?: '))
-problem_amount = int(input('How many unknown values do you want?: '))
 source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
+size = int(input('Input number (not applicable if you want input from file): '))
+problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str(size*size) + '): '))
+
+points_v2 = create_square(size)
+#outcome_final = []
+points_from_txt = []
+
+#print(points_v2_transposed.tolist())
+
+amount_of_elements = len(points_v2)*len(points_v2)
 
 def trial(trial_amount, problem_amount):
     interval_sum = 0
+    score_sum = 0
     i = 1
     if(source == 1):
         load_from_file()
+        #points_v2 = points_from_txt
     text_file = open('Result.txt', 'w')
-
-    wb = Workbook()
-    ws1 = wb.active
-    
-    ws1.title = 'Results'
-    ws1['A1'] = 'ID'
-    ws1['B1'] = 'SCORE'
-    ws1['C1'] = 'TIME'
-    ws1['D1'] = 'VARIABLES'
-    ws1.column_dimensions['A'].width = 20
-    ws1.column_dimensions['B'].width = 20
-    ws1.column_dimensions['C'].width = 20
-    ws1.column_dimensions['D'].width = 20
-    ws1.cell(1, 1).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    ws1.cell(1, 2).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    ws1.cell(1, 3).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-    ws = wb.create_sheet("Result")
-    ws['A1'] = 'ID'
-    ws['B1'] = 'SCORE'
-    ws['C1'] = 'TIME'
-    ws['D1'] = 'VARIABLES'
     
     for each in range(0, trial_amount):
-        #ws = wb.create_sheet("Result ", each)
         before = datetime.now()
         points_v2_normal = points_v2
+        
         problem(problem_amount,points_v2_normal)
-        #points_v2_problem_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
-        points_for_excel = []
-        points_for_excel_trouble = []
-
-        ###########Problem function to excel###################
-
-        for points in points_v2_normal:
-            for point in points:
-                points_for_excel_trouble.append(point)
-        pointer = 0
-        for each_r in rows_table:
-            for each_c in columns_table_trouble:
-                ws[str(each_c) + str(each_r + (each*7))] = points_for_excel_trouble[pointer]
-                pointer = pointer + 1
-        print(points_for_excel_trouble)
-        print(points_v2_normal)
-        print('HERE')
-
-        #######################################################
+        text_file.write('Problem ' + str(each + 1) + ':\n')
         for row in points_v2_normal:
             text_file.write(str(row) + '\n')
         text_file.write('\n')
-        solution_v2(points_v2_normal)
-        points_v2_normal_reversed = list(map(list, zip(points_v2_normal[0],points_v2_normal[1],points_v2_normal[2])))
+        final_outcome = solution_v2(points_v2_normal)
+        print(final_outcome)
         score = solution_t(points_v2_normal,problem_amount)
         after = datetime.now()
         interval = after - before
@@ -245,62 +194,26 @@ def trial(trial_amount, problem_amount):
             interval_sum = interval
         else:
             interval_sum = interval_sum + interval
-        text_file.write('Latin square: \n' + str(each + 1))
+        if(score_sum == 0):
+            score_sum = score
+        else:
+            score_sum = score_sum + score
+        text_file.write('Latin square ' + str(each + 1) + ':\n')
         for row in points_v2_normal:
             text_file.write(str(row) + '\n')
-        text_file.write('\n')
-        ws1['A' + str(i + 1)] = i
-        ws1['B' + str(i + 1)] = str(score) + '%'
-        ws1['C' + str(i + 1)] = str(interval)
-        ws1['D' + str(i + 1)] = str(problem_amount)
+        text_file.write('Time: ' + str(interval) + '\nScore: ' + str(round(score,0)) + '%\n')
+        text_file.write('\n--------------------------------------------------------\n\n')
         
-        ws['A' + str(2 + (each*7))] = i
-        ws['B' + str(2 + (each*7))] = str(score) + '%'
-        ws['C' + str(2 + (each*7))] = str(interval)
-        ws['D' + str(2 + (each*7))] = str(problem_amount)
-        ws.column_dimensions['A'].width = 20
-        ws.column_dimensions['B'].width = 20
-        ws.column_dimensions['C'].width = 20
-        ws.column_dimensions['D'].width = 20
-        ws.column_dimensions['G'].width = 20
-        ws.column_dimensions['H'].width = 20
-        ws.column_dimensions['I'].width = 20
-        ws.column_dimensions['K'].width = 20
-        ws.column_dimensions['L'].width = 20
-        ws.column_dimensions['M'].width = 20
-
-        ws.row_dimensions[5+(7*each)].height = 80
-        ws.row_dimensions[6+(7*each)].height = 80
-        ws.row_dimensions[7+(7*each)].height = 80
-        rows = range(5+(7*each),8+(7*each))
-        columns = range(7,14)
-        for row in rows:
-            for col in columns:
-                ws.cell(row, col).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-        for points in points_v2_normal:
-            for point in points:
-                points_for_excel.append(point)
-        pointer = 0
-        for each_r in rows_table:
-            for each_c in columns_table:
-                ws[str(each_c) + str(each_r + (each*7))] = points_for_excel[pointer]
-                pointer = pointer + 1
-        format_range = 'G' + str(5+(7*each)) + ':I' + str(7+(7*each))
-        format_range_trouble = 'K' + str(5+(7*each)) + ':M' + str(7+(7*each))
-        ws.conditional_formatting.add(format_range,ColorScaleRule(start_type='percentile', start_value=10, start_color='AA0000',mid_type='percentile', mid_value=50, mid_color='F7A311',end_type='percentile', end_value=90, end_color='00AA00'))
-        ws.conditional_formatting.add(format_range_trouble,ColorScaleRule(start_type='percentile', start_value=10, start_color='AA0000',mid_type='percentile', mid_value=50, mid_color='F7A311',end_type='percentile', end_value=90, end_color='00AA00'))
-        ws.column_dimensions['E'].hidden = True
-        ws.column_dimensions['F'].hidden = True
         print(interval)
         print(i)
         i = i + 1
-        print(points_v2)
-        points_for_excel = []
-        points_for_excel_trouble = []
-    text_file.write('Total time: ' + str(interval_sum) + '\nScore: ' + str(score) + '%\n\n')
+    Avg_score = round((score_sum/trial_amount),2)
+    Avg_time = (interval_sum/trial_amount)
+    text_file.write('Total time: ' + str(interval_sum) + '%\nAverage time: ' + str(Avg_time) + '\nAverage score: ' + str(Avg_score) + '%\n\n')
     text_file.close()
     print(interval_sum)
-    wb.save('Results.xlsx')
 
 trial(trial_amount,problem_amount)
-#175000 to ok 10 minut
+#print(outcome_final)
+
+
