@@ -86,6 +86,9 @@ def solution_v2(points_v2_normal):
     print(outcome)
     print(whole_row_in_x_counter)
     #print(points_v2_normal)
+    if(whole_row_in_x_counter == size):
+        print('Incorrect input')
+        quit()
     if(whole_row_in_x_counter > 0):
         outcome = np.transpose(outcome)
         outcome = outcome.tolist()
