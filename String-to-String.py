@@ -91,29 +91,134 @@ def climbing(points_v2_climbing):
     outcome = []
     for points in points_v2_climbing:
         for point in points:
-            print(point)
+            #print(point)
             if(point == 'x'):
-                final_point_score = solution_t(points_v2_climbing,problem_amount)
-                print(final_point_score)
-                for i in range(1,3+1):
+                test_list = copy.deepcopy(points_v2_climbing)
+                #test_list[test_list.index(points)][points.index(point)] = len(points)
+                final_point_score = solution_t(test_list,problem_amount)
+                print('Final point score ' + str(final_point_score))
+                for each in range(1,2*(len(points)+1)):
+                    i = random.randint(1,len(points_v2_climbing))
                     print('i: ' + str(i))
+                    test_list = copy.deepcopy(points_v2_climbing)
                     loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
                     #Trzeba pracować na kopii listy niż na oryginale
                     loop_list[loop_list.index(points)][points.index(point)] = i
                     score = solution_t(loop_list,problem_amount)
                     print('score of point: ' + str(score))
-                    if(score > final_point_score):
+                    if(score >= final_point_score):
                         final_point_score = score
                         points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
-                        print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
-                        print('example ' + str(points_v2_climbing))
+                        #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
+                        #print('example ' + str(points_v2_climbing))
                         break
-    print(points_v2_climbing) #print final list
+    print(points_v2_climbing)
+
+    ##########RANDOM################
+
+    #for each in range(1,2*(len(points)+1)):
+    #                i = random.randint(1,len(points_v2_climbing))
+    #                print('i: ' + str(i))
+    #                test_list = copy.deepcopy(points_v2_climbing)
+    #                loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
+    #                #Trzeba pracować na kopii listy niż na oryginale
+    #                loop_list[loop_list.index(points)][points.index(point)] = i
+    #                score = solution_t(loop_list,problem_amount)
+    #                print('score of point: ' + str(score))
+    #                if(score > final_point_score):
+    #                    final_point_score = score
+    #                    points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
+    #                    #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
+    #                    #print('example ' + str(points_v2_climbing))
+    #                    break
+
+    #h = 0 #x counter
+    #for points in points_v2_climbing:
+    #    for point in points:
+    #        if(point == 'x'):
+    #            h = h + 1
+    #if(h > 0):
+    #    points_v2_climbing = np.transpose(points_v2_climbing)
+    #    points_v2_climbing = points_v2_climbing.tolist()
+    #    points_v2_climbing = get_rid_of_strings(points_v2_climbing)
+    #    for points in points_v2_climbing:
+    #        for point in points:
+    #            #print(point)
+    #            if(point == 'x'):
+    #                test_list = copy.deepcopy(points_v2_climbing)
+    #                test_list[test_list.index(points)][points.index(point)] = len(points)
+    #                final_point_score = solution_t(test_list,problem_amount)
+    #                #print('Final point score ' + str(final_point_score))
+    #                for i in range(1,len(points)+1):
+    #                    #print('i: ' + str(i))
+    #                    test_list = copy.deepcopy(points_v2_climbing)
+    #                    loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
+    #                    #Trzeba pracować na kopii listy niż na oryginale
+    #                    loop_list[loop_list.index(points)][points.index(point)] = i
+    #                    score = solution_t(loop_list,problem_amount)
+    #                    #print('score of point: ' + str(score))
+    #                    if(score > final_point_score):
+    #                        final_point_score = score
+    #                        points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
+    #                        #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
+    #                        #print('example ' + str(points_v2_climbing))
+    #                        break
+                    #Dodań kolejną pętle aby wstawić cokolwiek co ma najwyższy score LUB na start dobierać 1 i dodawać to co ma lepszy score lub domyslnie 1
+    print('final list ' + str(points_v2_climbing)) #print final list
     return points_v2_climbing
 
 
-def tabu(points_v2_normal):
+def taboo(points_v2_normal):
+    for points in points_v2_normal:
+        for point in points:
+            if(point == 'x'):
+                candidates = []
+                points_v2_transposed = np.transpose(points_v2_normal)
+                points_v2_transposed = points_v2_transposed.tolist()
+                points_v2_transposed = get_rid_of_strings(points_v2_transposed)
+                taboo_list = sorted(np.unique(points+points_v2_transposed[points.index(point)]))
+                print(taboo_list)
+                ####COPY OF HILL CLIMBING#####
+                test_list = copy.deepcopy(points_v2_normal)
+                #test_list[test_list.index(points)][points.index(point)] = len(points)
+                final_point_score = solution_t(test_list,problem_amount)
+                print('Final point score ' + str(final_point_score))
+                for each in range(1,2*(len(points)+1)):
+                    i = random.randint(1,len(points_v2_normal))
+                    test_list = copy.deepcopy(points_v2_normal)
+                    loop_list = copy.deepcopy(points_v2_normal) #jedyna opcja działająca kopiowania listy
+                    #Trzeba pracować na kopii listy niż na oryginale
+                    loop_list[loop_list.index(points)][points.index(point)] = i
+                    score = solution_t(loop_list,problem_amount)
+                    #print('score of point: ' + str(score))
+                    point_and_score = [i,score]
+                    candidates.append(point_and_score)
+                    #print('Candidates: ' + str(candidates))
+                for candidate in candidates:
+                    if(candidate[0] in taboo_list):
+                        candidates.remove(candidate)
+                        print('Candidate without taboo: ' + str(candidates))
+                highest_score = candidates[0]
+                for point_score in candidates:
+                    if(point_score[1] > highest_score[1]):
+                        highest_score = point_score
+                points_v2_normal[points_v2_normal.index(points)][points.index(point)] = highest_score[0]
+                print('Inserted: ' + str(highest_score[0]))
+    print('final list ' + str(points_v2_normal)) #print final list
+    return points_v2_normal
+
+def SA():
     print('test')
+
+
+    #Zainicjować
+        #Na start lista na wejście + lista po transpozycji do stworzenia listy tabu
+    #Stworzyć listę kandydatów na sąsiadów obecnego rozwiązania (W tym wypadku pętla for i jechane po każdej wartości)
+    #Znalezienie rozwiązania z najlepszą wartością
+    #Sprawdzenie czy nie jest w tabu
+    #Jeśli jest to sprawdzenie jeszcze raz, ale bez tej wartości, a jak nie to przyjąc to jako nowy stan początkowy
+    #Czy kryterium końcowe zostało spełnione
+    #Koniec
 
 #def format_outcome(outcome):
 #    solution = solution_v2(outcome)
@@ -131,21 +236,22 @@ def solution_t(points_v2_score,problem_amount):
             elif(points.count(point) == 1):
                 i = i + 1
             else:
-                i = i - 1
+                i = i# - 1
     points_v2_transposed = np.transpose(points_v2_score)
     points_v2_transposed = points_v2_transposed.tolist()
+    #points_v2_transposed = get_rid_of_strings(points_v2_transposed) # dopiero dodana 04.06.2020
     for points in points_v2_transposed:
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                i = i# - 1
+                j = j# - 1
             elif(points.count(point) == 1):
                 j = j + 1
             else:
-                j = j - 1#+ (1/2)
-    print('I_SCORE: ' + str(i))
-    print('J_SCORE: ' + str(j))
-    score = (i + j)/18
+                j = j# - 1#+ (1/2)
+    #print('I_SCORE: ' + str(i))
+    #print('J_SCORE: ' + str(j))
+    score = (i + j)#/((elements*elements)*2)
     #score = round((i + j)/(amount_of_elements*2),2)*100
     #print(score,'%',sep='')
     return score
@@ -173,7 +279,7 @@ new_points_transposed = []
 problem_amount = 0
 solution_amount = 0
 trial_amount = int(input('How many test cases?: '))
-algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n'))
+algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n'))
 source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
 size = int(input('Input number (not applicable if you want input from file): '))
 problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str(size*size) + '): '))
@@ -200,7 +306,7 @@ def trial(trial_amount, problem_amount):
         points_v2_normal = points_v2
         
         problem(problem_amount,points_v2_normal)
-        points_v2_climbing = copy.deepcopy(points_v2_normal) # zbędna linia bo tylko kopiuje referencje i puszczam jeden algorytm naraz
+        #points_v2_climbing = copy.deepcopy(points_v2_normal) # zbędna linia bo tylko kopiuje referencje i puszczam jeden algorytm naraz
         text_file.write('Problem ' + str(each + 1) + ':\n')
         for row in points_v2_normal:
             text_file.write(str(row) + '\n')
@@ -209,7 +315,9 @@ def trial(trial_amount, problem_amount):
         if(algorithm == 1):
             final_outcome = solution_v2(points_v2_normal)
         elif(algorithm == 2):
-            final_outcome = climbing(points_v2_climbing)
+            final_outcome = climbing(points_v2_normal)
+        elif(algorithm == 3):
+            final_outcome = taboo(points_v2_normal)
         score = solution_t(final_outcome,problem_amount)
         after = datetime.now()
         interval = after - before
@@ -228,6 +336,7 @@ def trial(trial_amount, problem_amount):
         text_file.write('\n--------------------------------------------------------\n\n')
         
         print(interval)
+        print(score/(amount_of_elements*2))
         print(i)
         i = i + 1
     Avg_score = round((score_sum/trial_amount),2)
