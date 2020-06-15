@@ -4,11 +4,12 @@ from datetime import datetime
 import numpy as np
 from itertools import combinations
 import copy
+import operator
+from scipy.stats import uniform
 
 #Utowrzenie latin square
 def create_square(size: int):
     row = [i for i in range(1, size+1)]
-    #print(row)
     return [row[i:] + row[:i] for i in range(size)]
 
 
@@ -85,7 +86,7 @@ def solution_v2(points_v2_normal):
         result = outcome
         return result
 
-def climbing(points_v2_climbing):
+def climbing(points_v2_climbing,amount_of_generated_elements):
     #Stworzenie wszystkich możliwych rozwiązań z otoczenia
     #Iterować po każdym punkcie gdzie jest x i forem sprawdzać która wartość zwraca najlepszy wynik i jechać dalej
     outcome = []
@@ -96,8 +97,11 @@ def climbing(points_v2_climbing):
                 test_list = copy.deepcopy(points_v2_climbing)
                 #test_list[test_list.index(points)][points.index(point)] = len(points)
                 final_point_score = solution_t(test_list,problem_amount)
-                print('Final point score ' + str(final_point_score))
-                for each in range(1,2*(len(points)+1)):
+                final_point = None
+                print('Final point score: ' + str(final_point_score))
+                if(amount_of_generated_elements == 0):
+                    amount_of_generated_elements = 2*(len(points)+1)
+                for each in range(1,amount_of_generated_elements):
                     i = random.randint(1,len(points_v2_climbing))
                     print('i: ' + str(i))
                     test_list = copy.deepcopy(points_v2_climbing)
@@ -108,108 +112,126 @@ def climbing(points_v2_climbing):
                     print('score of point: ' + str(score))
                     if(score >= final_point_score):
                         final_point_score = score
-                        points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
+                        final_point = int(i)
+                    if(each == amount_of_generated_elements-1):
+                        points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = final_point
                         #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
                         #print('example ' + str(points_v2_climbing))
-                        break
+                        #break
+                #points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
     print(points_v2_climbing)
-
-    ##########RANDOM################
-
-    #for each in range(1,2*(len(points)+1)):
-    #                i = random.randint(1,len(points_v2_climbing))
-    #                print('i: ' + str(i))
-    #                test_list = copy.deepcopy(points_v2_climbing)
-    #                loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
-    #                #Trzeba pracować na kopii listy niż na oryginale
-    #                loop_list[loop_list.index(points)][points.index(point)] = i
-    #                score = solution_t(loop_list,problem_amount)
-    #                print('score of point: ' + str(score))
-    #                if(score > final_point_score):
-    #                    final_point_score = score
-    #                    points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
-    #                    #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
-    #                    #print('example ' + str(points_v2_climbing))
-    #                    break
-
-    #h = 0 #x counter
-    #for points in points_v2_climbing:
-    #    for point in points:
-    #        if(point == 'x'):
-    #            h = h + 1
-    #if(h > 0):
-    #    points_v2_climbing = np.transpose(points_v2_climbing)
-    #    points_v2_climbing = points_v2_climbing.tolist()
-    #    points_v2_climbing = get_rid_of_strings(points_v2_climbing)
-    #    for points in points_v2_climbing:
-    #        for point in points:
-    #            #print(point)
-    #            if(point == 'x'):
-    #                test_list = copy.deepcopy(points_v2_climbing)
-    #                test_list[test_list.index(points)][points.index(point)] = len(points)
-    #                final_point_score = solution_t(test_list,problem_amount)
-    #                #print('Final point score ' + str(final_point_score))
-    #                for i in range(1,len(points)+1):
-    #                    #print('i: ' + str(i))
-    #                    test_list = copy.deepcopy(points_v2_climbing)
-    #                    loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
-    #                    #Trzeba pracować na kopii listy niż na oryginale
-    #                    loop_list[loop_list.index(points)][points.index(point)] = i
-    #                    score = solution_t(loop_list,problem_amount)
-    #                    #print('score of point: ' + str(score))
-    #                    if(score > final_point_score):
-    #                        final_point_score = score
-    #                        points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
-    #                        #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
-    #                        #print('example ' + str(points_v2_climbing))
-    #                        break
                     #Dodań kolejną pętle aby wstawić cokolwiek co ma najwyższy score LUB na start dobierać 1 i dodawać to co ma lepszy score lub domyslnie 1
-    print('final list ' + str(points_v2_climbing)) #print final list
+    print('final list: ' + str(points_v2_climbing)) #print final list
     return points_v2_climbing
 
 
-def taboo(points_v2_normal):
+def taboo(points_v2_normal,amount_of_generated_elements):
+    h = 0
     for points in points_v2_normal:
+        #points_v2_normal = np.transpose(points_v2_normal)
+        #points_v2_normal = points_v2_normal.tolist()
+        #points_v2_normal = get_rid_of_strings(points_v2_normal)
+        j = 0
         for point in points:
             if(point == 'x'):
+                
+                print(j)
                 candidates = []
                 points_v2_transposed = np.transpose(points_v2_normal)
                 points_v2_transposed = points_v2_transposed.tolist()
                 points_v2_transposed = get_rid_of_strings(points_v2_transposed)
-                taboo_list = sorted(np.unique(points+points_v2_transposed[points.index(point)]))
+                taboo_list = sorted(np.unique(points+points_v2_transposed[j]))
+                #taboo_list_x = sorted(np.unique(points))
+                #taboo_list_y = sorted(np.unique(points_v2_transposed[points.index(point)]))
+                print('points: ' + str(points))
+                print('points_transposed: ' + str(points_v2_transposed[j]))
+                #taboo_list = get_rid_of_strings(taboo_list)
                 print(taboo_list)
                 ####COPY OF HILL CLIMBING#####
                 test_list = copy.deepcopy(points_v2_normal)
                 #test_list[test_list.index(points)][points.index(point)] = len(points)
                 final_point_score = solution_t(test_list,problem_amount)
                 print('Final point score ' + str(final_point_score))
-                for each in range(1,2*(len(points)+1)):
+                if(amount_of_generated_elements == 0):
+                    amount_of_generated_elements = 3*(len(points)+1)
+                for each in range(1,amount_of_generated_elements):
                     i = random.randint(1,len(points_v2_normal))
                     test_list = copy.deepcopy(points_v2_normal)
                     loop_list = copy.deepcopy(points_v2_normal) #jedyna opcja działająca kopiowania listy
                     #Trzeba pracować na kopii listy niż na oryginale
-                    loop_list[loop_list.index(points)][points.index(point)] = i
+                    loop_list[loop_list.index(points)][j] = i
                     score = solution_t(loop_list,problem_amount)
                     #print('score of point: ' + str(score))
                     point_and_score = [i,score]
                     candidates.append(point_and_score)
                     #print('Candidates: ' + str(candidates))
-                for candidate in candidates:
-                    if(candidate[0] in taboo_list):
+                print('Candidate with taboo: ' + str(candidates))
+                #candidates = sorted(candidates, key=operator.itemgetter(0))
+                for candidate in candidates[:]:
+                    if(str(candidate[0]) in taboo_list):
                         candidates.remove(candidate)
-                        print('Candidate without taboo: ' + str(candidates))
-                highest_score = candidates[0]
+                print('Candidate without taboo: ' + str(candidates))
+                if(len(candidates) == 0):
+                    highest_score = 'x'
+                else:
+                    #highest_score = candidates[0]
+                    highest_score = ['x',solution_t(points_v2_normal,problem_amount)]
                 for point_score in candidates:
                     if(point_score[1] > highest_score[1]):
                         highest_score = point_score
                 points_v2_normal[points_v2_normal.index(points)][points.index(point)] = highest_score[0]
                 print('Inserted: ' + str(highest_score[0]))
+                taboo_list = []
+            j = j + 1
+        h = h + 1
     print('final list ' + str(points_v2_normal)) #print final list
     return points_v2_normal
 
-def SA():
-    print('test')
 
+def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
+    #def T(k):
+    #    T = 4000/k
+    #    return T
+    outcome = []
+    for points in points_v2_normal:
+        for point in points:
+            #print(point)
+            if(point == 'x'):
+                test_list = copy.deepcopy(points_v2_normal)
+                #test_list[test_list.index(points)][points.index(point)] = len(points)
+                final_point_score = solution_t(test_list,problem_amount)
+                final_point = None
+                print('Final point score: ' + str(final_point_score))
+                if(amount_of_generated_elements == 0):
+                    amount_of_generated_elements = 4*(len(points)+1)
+                for each in range(1,amount_of_generated_elements):
+                    i = random.randint(1,len(points_v2_normal))
+                    print('i: ' + str(i))
+                    test_list = copy.deepcopy(points_v2_normal)
+                    loop_list = copy.deepcopy(points_v2_normal) #jedyna opcja działająca kopiowania listy
+                    #Trzeba pracować na kopii listy niż na oryginale
+                    loop_list[loop_list.index(points)][points.index(point)] = i
+                    score = solution_t(loop_list,problem_amount)
+                    print('score of point: ' + str(score))
+                    if(score >= final_point_score):
+                        final_point_score = score
+                        final_point = int(i)
+                    else:
+                        U = random.uniform(0,1)
+                        counter = abs(score-final_point_score)
+                        temperature = first_temperature/each
+                        inside = counter/temperature
+                        whole = math.exp(inside)
+                        if(U < whole):
+                            final_point_score = score
+                            final_point = int(i)
+                    ###TUTDAJ DODAC ELSE I RESZTE ALGORYTMU
+                    if(each == amount_of_generated_elements-1):
+                        points_v2_normal[points_v2_normal.index(points)][points.index(point)] = final_point
+    print(points_v2_normal)
+                    #Dodań kolejną pętle aby wstawić cokolwiek co ma najwyższy score LUB na start dobierać 1 i dodawać to co ma lepszy score lub domyslnie 1
+    print('final list: ' + str(points_v2_normal)) #print final list
+    return points_v2_normal
 
     #Zainicjować
         #Na start lista na wejście + lista po transpozycji do stworzenia listy tabu
@@ -232,11 +254,11 @@ def solution_t(points_v2_score,problem_amount):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                i = i# - 1
+                i = i - 2
             elif(points.count(point) == 1):
                 i = i + 1
             else:
-                i = i# - 1
+                i = i - 1
     points_v2_transposed = np.transpose(points_v2_score)
     points_v2_transposed = points_v2_transposed.tolist()
     #points_v2_transposed = get_rid_of_strings(points_v2_transposed) # dopiero dodana 04.06.2020
@@ -244,11 +266,11 @@ def solution_t(points_v2_score,problem_amount):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                j = j# - 1
+                j = j - 2
             elif(points.count(point) == 1):
                 j = j + 1
-            else:
-                j = j# - 1#+ (1/2)
+            else:   
+                j = j - 1#+ (1/2)
     #print('I_SCORE: ' + str(i))
     #print('J_SCORE: ' + str(j))
     score = (i + j)#/((elements*elements)*2)
@@ -279,10 +301,13 @@ new_points_transposed = []
 problem_amount = 0
 solution_amount = 0
 trial_amount = int(input('How many test cases?: '))
-algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n'))
+algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n4-SA\n'))
+if(algorithm == 4):
+    first_temp = int(input('Input the first temperature:\n'))
+amount_of_iterations = int(input('How many iterations do you want?:\n'))
 source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
 size = int(input('Input number (not applicable if you want input from file): '))
-problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str(size*size) + '): '))
+problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str((size*size)-1) + '): '))
 
 points_v2 = create_square(size)
 #outcome_final = []
@@ -315,9 +340,11 @@ def trial(trial_amount, problem_amount):
         if(algorithm == 1):
             final_outcome = solution_v2(points_v2_normal)
         elif(algorithm == 2):
-            final_outcome = climbing(points_v2_normal)
+            final_outcome = climbing(points_v2_normal,amount_of_iterations)
         elif(algorithm == 3):
-            final_outcome = taboo(points_v2_normal)
+            final_outcome = taboo(points_v2_normal,amount_of_iterations)
+        elif(algorithm == 4):
+            final_outcome = SA(points_v2_normal,first_temp,amount_of_iterations)
         score = solution_t(final_outcome,problem_amount)
         after = datetime.now()
         interval = after - before
