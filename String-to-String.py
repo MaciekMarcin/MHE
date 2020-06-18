@@ -36,6 +36,7 @@ def get_rid_of_strings(points_v2_wo_strings):
 #Funkcja rozwiązania która próbuje z problemu osiągnąć stan na wejściu
 def solution_v2(points_v2_normal):
     #print(points_v2_normal)
+    #size = len(points_v2_normal)
     outcome = []
     whole_row_in_x_counter = 0
     for points in points_v2_normal:
@@ -83,8 +84,35 @@ def solution_v2(points_v2_normal):
         for row in outcome:
             print(row)
         #print(outcome)
+        print(size)
         result = outcome
         return result
+
+def bruteforce_hard_way(points_v2_normal, problem_amount):
+    Failed_tries = []
+    while(True):
+        problem_square = copy.deepcopy(points_v2_normal)
+        for points in problem_square:
+            for point in points:
+                if(point == 'x'):
+                    problem_square[problem_square.index(points)][points.index(point)] = random.randint(1,len(problem_square))
+        if(problem_square in Failed_tries):
+            continue
+        score = solution_t(problem_square,problem_amount)
+        if(score != 1):
+            Failed_tries.append(problem_square)
+        elif(score == 1):
+            return problem_square
+            break
+
+def complete_bruteforce(points_v2_normal, problem_amount):
+    easy_bruteforce = solution_v2(points_v2_normal)
+    easy_bruteforce_score = solution_t(easy_bruteforce, problem_amount)
+    if(easy_bruteforce_score < 1):
+        hard_way_score = bruteforce_hard_way(points_v2_normal, problem_amount)
+        return hard_way_score
+    return easy_bruteforce
+    
 
 def climbing(points_v2_climbing,amount_of_generated_elements):
     #Stworzenie wszystkich możliwych rozwiązań z otoczenia
@@ -100,7 +128,7 @@ def climbing(points_v2_climbing,amount_of_generated_elements):
                 final_point = None
                 print('Final point score: ' + str(final_point_score))
                 if(amount_of_generated_elements == 0):
-                    amount_of_generated_elements = 2*(len(points)+1)
+                    amount_of_generated_elements = 3*(len(points)+1)
                 for each in range(1,amount_of_generated_elements):
                     i = random.randint(1,len(points_v2_climbing))
                     print('i: ' + str(i))
@@ -124,8 +152,18 @@ def climbing(points_v2_climbing,amount_of_generated_elements):
     print('final list: ' + str(points_v2_climbing)) #print final list
     return points_v2_climbing
 
+def tabu_search_for_x(points_v2):
+    x_counter = 0
+    for points in points_v2:
+        for point in points:
+            if(point == 'x'):
+                x_counter = x_counter + 1
+    return x_counter
 
-def taboo(points_v2_normal,amount_of_generated_elements):
+
+def taboo(points_v3,amount_of_generated_elements):
+    points_v2_normal = copy.deepcopy(points_v3)
+    retry_list = copy.deepcopy(points_v3)
     h = 0
     for points in points_v2_normal:
         #points_v2_normal = np.transpose(points_v2_normal)
@@ -184,11 +222,21 @@ def taboo(points_v2_normal,amount_of_generated_elements):
                 taboo_list = []
             j = j + 1
         h = h + 1
+    x_variable = tabu_search_for_x(points_v2_normal)
+    #if(x_variable > 0):
+    #    taboo(retry_list,amount_of_generated_elements)
+    #else:
     print('final list ' + str(points_v2_normal)) #print final list
     return points_v2_normal
 
 
 def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
+    
+    #była możliwość zmiany funkcji temperatury.
+    #była możliwość zmiany parametrów funkcji temperatury.
+    #była możliwość ustalenia liczby iteracji.
+    #była możliwość wypisania wartości funkcji celu dla kolejnych iteracji.
+
     #def T(k):
     #    T = 4000/k
     #    return T
@@ -233,18 +281,143 @@ def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
     print('final list: ' + str(points_v2_normal)) #print final list
     return points_v2_normal
 
-    #Zainicjować
-        #Na start lista na wejście + lista po transpozycji do stworzenia listy tabu
-    #Stworzyć listę kandydatów na sąsiadów obecnego rozwiązania (W tym wypadku pętla for i jechane po każdej wartości)
-    #Znalezienie rozwiązania z najlepszą wartością
-    #Sprawdzenie czy nie jest w tabu
-    #Jeśli jest to sprawdzenie jeszcze raz, ale bez tej wartości, a jak nie to przyjąc to jako nowy stan początkowy
-    #Czy kryterium końcowe zostało spełnione
-    #Koniec
+def fitness(points_v2_score):
+    i = 0
+    j = 0
+    for points in points_v2_score:
+        for point in points:
+            elements = len(points)
+            if(point == 'x'):
+                i = i - 2
+            elif(points.count(point) == 1):
+                i = i + 1
+            else:
+                i = i - 1# + 0.25
+    points_v2_transposed = np.transpose(points_v2_score)
+    points_v2_transposed = points_v2_transposed.tolist()
+    print(points_v2_transposed)
+    for points in points_v2_transposed:
+        for point in points:
+            elements = len(points)
+            if(point == 'x'):
+                j = j - 2
+            elif(points.count(point) == 1):
+                j = j + 1
+            else:   
+                j = j - 1# + 0.25
+    score = (i + j)/(2*(len(points_v2_score)*len(points_v2_score)))
+    return score
 
-#def format_outcome(outcome):
-#    solution = solution_v2(outcome)
-#    print(*outcome, sep='\n', end='\n\n')
+def mating_pool(pool_size,scores):
+    scores_sorted = copy.deepcopy(scores)
+    scores_sorted.sort(key=lambda sublist: sublist[0], reverse=True)
+    pool = scores_sorted[:int(pool_size)]
+    print('pool: ' + str(pool))
+    return pool
+
+def crossover_probability(a, b, probability):
+    new_member_a = copy.deepcopy(a)
+    new_member_b = copy.deepcopy(b)
+    for points in new_member_a:
+        for point in points:
+            #if(point != new_member_b[new_member_a.index(point)]):
+            #    if(probability < 1):
+            #        if(random.random() <= probability):
+            #            new_member_b[new_member_a.index(point)] = point
+            print('test')
+    for points in new_member_b:
+        for point in points:
+            #if(point != new_member_a[new_member_b.index(point)]):
+            #    if(probability < 1):
+            #        if(random.random() <= probability):
+            #            new_member_a[new_member_b.index(point)] = point
+            print('test')
+
+    return new_member_a, new_member_b
+
+def crossover_simple(parent_1, parent_2):
+    crossover_index = random.randrange(1, len(parent_1))
+    child_1 = parent_1[:crossover_index] + parent_2[crossover_index:]
+    child_2 = parent_2[:crossover_index] + parent_1[crossover_index:]
+    return child_1, child_2
+        
+
+def mutation(member, probability):
+    New_member = copy.deepcopy(member)
+    for points in New_member:
+        for point in points:
+            if(random.random() <= probability):
+                New_member[New_member.index(points)][points.index(point)] = random.randint(1,len(New_member))
+                print('MUTATION')
+    return New_member
+
+def create_population(problem_square):
+    New_member = copy.deepcopy(problem_square)
+    for points in New_member:
+        for point in points:
+            if(point == 'x'):
+                New_member[New_member.index(points)][points.index(point)] = random.randint(1,len(New_member))
+    return New_member
+
+def create_generation(problem_square,amount):
+    population = []
+    for i in range(1,amount+1):
+        population.append(create_population(problem_square))
+    return population
+
+def score_generation(population):
+    scores = []
+    for i in population:
+        scores.append([fitness(i),i])
+    scores.sort(key=lambda sublist: sublist[0], reverse=True)
+    return scores
+
+
+def Genetic(points_v2_normal,generation_size,mating_pool_size,iterations,cs_probability_percent,mutation_probability):
+    population = create_generation(points_v2_normal,generation_size)
+    best_candidates_scores = []
+    score = []
+    for each in population:
+        print('each: ' + str(each))
+    while(iterations > 0):
+        scores_iteration = []
+        print('SCORE: ' + str(scores_iteration))
+        Sum_score = 0.0
+        for i in population:
+            scores_iteration.append([fitness(i),i])
+            Sum_score = Sum_score + fitness(i)
+        Avg_score = Sum_score/generation_size
+        pool = mating_pool(mating_pool_size,scores_iteration)
+
+        before_crossover = []
+        crossover_population = []
+        crossover_generation = []
+        for each in pool:
+            before_crossover.append(each[1])
+        print('Before: ' + str(before_crossover))
+        for element in before_crossover:
+            crossover_population.append(element)
+            before_crossover.remove(element)
+            for parent in before_crossover:
+                a, b = crossover_simple(element,parent)                
+                crossover_generation.append(a)
+                crossover_generation.append(b)
+        print('After: ' + str(crossover_generation))
+
+        population_mutated = []
+        for sample in crossover_generation:
+            x = mutation(sample,mutation_probability)
+            population_mutated.append(x)
+        last_scoring = score_generation(population_mutated)
+        print('Avg_score: ' + str(Avg_score))
+        best_candidate = last_scoring[0]
+        if(best_candidate[0] == 1):
+            iterations = 0
+        scores_iteration = []
+        population = population_mutated
+        iterations = iterations - 1
+        print('Best: ' + str(best_candidate[1]))
+    return best_candidate[1]
 
 
 def solution_t(points_v2_score,problem_amount):
@@ -301,13 +474,24 @@ new_points_transposed = []
 problem_amount = 0
 solution_amount = 0
 trial_amount = int(input('How many test cases?: '))
-algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n4-SA\n'))
+algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n4-SA\n5-GA\n'))
 if(algorithm == 4):
     first_temp = int(input('Input the first temperature:\n'))
-amount_of_iterations = int(input('How many iterations do you want?:\n'))
+if(algorithm == 5):
+    generation_size = int(input('Insert generation size: '))
+    mating_pool_size = int(input('Declare mating pool: '))
+    crossover_probability = float(input('Insert crossover probability from 0.01 to 1.00: '))
+    mutation_probability = float(input('Insert mutation probability from 0.01 to 1.00: '))
+if(algorithm in [2,3,4,5]):
+    amount_of_iterations = int(input('How many iterations do you want?:\n'))
 source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
-size = int(input('Input number (not applicable if you want input from file): '))
-problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str((size*size)-1) + '): '))
+random_decision = int(input('Select mode:\n1-Manual\n2-Random\n'))
+if(random_decision == 1):
+    size = int(input('Input number (not applicable if you want input from file): '))
+    problem_amount = int(input('How many unknown values do you want? (Max amount is: ' + str((size*size)-1) + '): '))
+if(random_decision == 2):
+    size = random.randint(2,10)
+    problem_amount = random.randint(1,(size*size)-1)
 
 points_v2 = create_square(size)
 #outcome_final = []
@@ -338,13 +522,15 @@ def trial(trial_amount, problem_amount):
         text_file.write('\n')
         #######FROM HERE ONWARD BRUTEFORCE############
         if(algorithm == 1):
-            final_outcome = solution_v2(points_v2_normal)
+            final_outcome = complete_bruteforce(points_v2_normal,problem_amount)
         elif(algorithm == 2):
             final_outcome = climbing(points_v2_normal,amount_of_iterations)
         elif(algorithm == 3):
             final_outcome = taboo(points_v2_normal,amount_of_iterations)
         elif(algorithm == 4):
             final_outcome = SA(points_v2_normal,first_temp,amount_of_iterations)
+        elif(algorithm == 5):
+            final_outcome = Genetic(points_v2_normal,generation_size,mating_pool_size,amount_of_iterations,crossover_probability,mutation_probability)
         score = solution_t(final_outcome,problem_amount)
         after = datetime.now()
         interval = after - before
