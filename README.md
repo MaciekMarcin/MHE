@@ -5,6 +5,11 @@ Tematem moim jest Latin Square i problem czy jest możliwe dokończenie niekompl
 
 Kwadrat jest reprezentowany jako Listy zagnieżdżone w Liście. Element nieznany jest generowany losowo, ilość takich elementów przekazuje się w parametrze. Ilość nieznanych elementów może wynosić maksymalnie (n^n)-1 gdzie n to liczba elementów w rzędzie, a -1 dlatego że problem opiera się na dokończeniu niekompletnego rozwiązania zamiast stworzenia nowego kwadratu.
 
+Po głębszym zastanowieniu się, problem ten przypomina sudoku, ale gorsze. Dlaczego?
+-Sudoku posiada określony rozmiar planszy (9 kwadratów rozmiaru 3x3), gdzie tutaj mamy dowolność.
+-W przypadku uzupełniania sudoku możemy korzystać z zależności że kwadrat składa się z 9 mniejszych kwadratów przez co łatwiej da się go wypełnić
+-Niektóre metaheurystyki/algorytmy nie mają sensu w przypadku latin square.
+
 Program pierw uzupełnia każdą listę która jest w pozycji początkowej po czym obraca tę listę na poniższej zasadzie:
 
 *Zmienia*:
