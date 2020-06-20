@@ -2,10 +2,15 @@ import random
 import math
 from datetime import datetime
 import numpy as np
-from itertools import combinations
+#from itertools import combinations
 import copy
 import operator
 from scipy.stats import uniform
+import sys
+import matplotlib.pyplot as plt; plt.rcdefaults()
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib
 
 #Utowrzenie latin square
 def create_square(size: int):
@@ -114,7 +119,7 @@ def complete_bruteforce(points_v2_normal, problem_amount):
     return easy_bruteforce
     
 
-def climbing(points_v2_climbing,amount_of_generated_elements):
+def climbing(points_v2_climbing):
     #Stworzenie wszystkich możliwych rozwiązań z otoczenia
     #Iterować po każdym punkcie gdzie jest x i forem sprawdzać która wartość zwraca najlepszy wynik i jechać dalej
     outcome = []
@@ -127,10 +132,8 @@ def climbing(points_v2_climbing,amount_of_generated_elements):
                 final_point_score = solution_t(test_list,problem_amount)
                 final_point = None
                 print('Final point score: ' + str(final_point_score))
-                if(amount_of_generated_elements == 0):
-                    amount_of_generated_elements = 3*(len(points)+1)
-                for each in range(1,amount_of_generated_elements):
-                    i = random.randint(1,len(points_v2_climbing))
+                for each in range(1,len(points)+1):
+                    i = each #random.randint(1,len(points_v2_climbing))
                     print('i: ' + str(i))
                     test_list = copy.deepcopy(points_v2_climbing)
                     loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
@@ -141,14 +144,8 @@ def climbing(points_v2_climbing,amount_of_generated_elements):
                     if(score >= final_point_score):
                         final_point_score = score
                         final_point = int(i)
-                    if(each == amount_of_generated_elements-1):
+                    if(each == len(points)):
                         points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = final_point
-                        #print('inserted ' + str(i) + ' at ['+ str(points_v2_climbing.index(points)) + ',' + str(points.index(i)) + ']')
-                        #print('example ' + str(points_v2_climbing))
-                        #break
-                #points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = int(i)
-    print(points_v2_climbing)
-                    #Dodań kolejną pętle aby wstawić cokolwiek co ma najwyższy score LUB na start dobierać 1 i dodawać to co ma lepszy score lub domyslnie 1
     print('final list: ' + str(points_v2_climbing)) #print final list
     return points_v2_climbing
 
@@ -161,7 +158,7 @@ def tabu_search_for_x(points_v2):
     return x_counter
 
 
-def taboo(points_v3,amount_of_generated_elements):
+def taboo(points_v3):
     points_v2_normal = copy.deepcopy(points_v3)
     retry_list = copy.deepcopy(points_v3)
     h = 0
@@ -190,10 +187,10 @@ def taboo(points_v3,amount_of_generated_elements):
                 #test_list[test_list.index(points)][points.index(point)] = len(points)
                 final_point_score = solution_t(test_list,problem_amount)
                 print('Final point score ' + str(final_point_score))
-                if(amount_of_generated_elements == 0):
-                    amount_of_generated_elements = 3*(len(points)+1)
-                for each in range(1,amount_of_generated_elements):
-                    i = random.randint(1,len(points_v2_normal))
+                #if(amount_of_generated_elements == 0):
+                #    amount_of_generated_elements = 3*(len(points)+1)
+                for each in range(1,len(points)+1):
+                    i = each #random.randint(1,len(points_v2_normal))
                     test_list = copy.deepcopy(points_v2_normal)
                     loop_list = copy.deepcopy(points_v2_normal) #jedyna opcja działająca kopiowania listy
                     #Trzeba pracować na kopii listy niż na oryginale
@@ -230,7 +227,7 @@ def taboo(points_v3,amount_of_generated_elements):
     return points_v2_normal
 
 
-def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
+def SA(points_v2_normal,first_temperature):
     
     #była możliwość zmiany funkcji temperatury.
     #była możliwość zmiany parametrów funkcji temperatury.
@@ -250,10 +247,10 @@ def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
                 final_point_score = solution_t(test_list,problem_amount)
                 final_point = None
                 print('Final point score: ' + str(final_point_score))
-                if(amount_of_generated_elements == 0):
-                    amount_of_generated_elements = 4*(len(points)+1)
-                for each in range(1,amount_of_generated_elements):
-                    i = random.randint(1,len(points_v2_normal))
+                #if(amount_of_generated_elements == 0):
+                #    amount_of_generated_elements = 4*(len(points)+1)
+                for each in range(1,len(points)+1):
+                    i = each #random.randint(1,len(points_v2_normal))
                     print('i: ' + str(i))
                     test_list = copy.deepcopy(points_v2_normal)
                     loop_list = copy.deepcopy(points_v2_normal) #jedyna opcja działająca kopiowania listy
@@ -274,7 +271,7 @@ def SA(points_v2_normal,first_temperature,amount_of_generated_elements):
                             final_point_score = score
                             final_point = int(i)
                     ###TUTDAJ DODAC ELSE I RESZTE ALGORYTMU
-                    if(each == amount_of_generated_elements-1):
+                    if(each == len(points)):
                         points_v2_normal[points_v2_normal.index(points)][points.index(point)] = final_point
     print(points_v2_normal)
                     #Dodań kolejną pętle aby wstawić cokolwiek co ma najwyższy score LUB na start dobierać 1 i dodawać to co ma lepszy score lub domyslnie 1
@@ -427,11 +424,11 @@ def solution_t(points_v2_score,problem_amount):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                i = i - 2
+                i = i# - 2
             elif(points.count(point) == 1):
                 i = i + 1
             else:
-                i = i - 1
+                i = i# - 1
     points_v2_transposed = np.transpose(points_v2_score)
     points_v2_transposed = points_v2_transposed.tolist()
     #points_v2_transposed = get_rid_of_strings(points_v2_transposed) # dopiero dodana 04.06.2020
@@ -439,11 +436,11 @@ def solution_t(points_v2_score,problem_amount):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                j = j - 2
+                j = j# - 2
             elif(points.count(point) == 1):
                 j = j + 1
             else:   
-                j = j - 1#+ (1/2)
+                j = j# - 1#+ (1/2)
     #print('I_SCORE: ' + str(i))
     #print('J_SCORE: ' + str(j))
     score = (i + j)#/((elements*elements)*2)
@@ -465,25 +462,77 @@ def load_from_file():
         points_from_txt.append(temp_list)
     print(points_from_txt)
 
+def pick_algorithms():
+    algorithms = []
+    checked = '[x]'
+    not_checked = '[ ]'
+    bruteforce_check = not_checked
+    hillclimb_check = not_checked
+    tabu_check = not_checked
+    SA_check = not_checked
+    GA_check = not_checked
+    while(True):
+        choice = int(input('Select algorithm:\n' + str(bruteforce_check) + '1-Bruteforce\n' + str(hillclimb_check) + '2-Climbing\n' + str(tabu_check) + '3-Tabu Search\n' + str(SA_check) + '4-SA\n' + str(GA_check) + '5-GA\n6-Proceed\n'))
+        if(choice != 6):
+            if(choice == 1):
+                if(bruteforce_check == checked):
+                    bruteforce_check = not_checked
+                    algorithms.remove(1)
+                else:
+                    bruteforce_check = checked
+                    algorithms.append(1)
+            if(choice == 2):
+                if(hillclimb_check == checked):
+                    hillclimb_check = not_checked
+                    algorithms.remove(2)
+                else:
+                    hillclimb_check = checked
+                    algorithms.append(2)
+            if(choice == 3):
+                if(tabu_check == checked):
+                    tabu_check = not_checked
+                    algorithms.remove(3)
+                else:
+                    tabu_check = checked
+                    algorithms.append(3)
+            if(choice == 4):
+                if(SA_check == checked):
+                    SA_check = not_checked
+                    algorithms.remove(4)
+                else:
+                    SA_check = checked
+                    algorithms.append(4)
+            if(choice == 5):
+                if(GA_check == checked):
+                    GA_check = not_checked
+                    algorithms.remove(5)
+                else:
+                    GA_check = checked
+                    algorithms.append(5)
+        else:
+            return algorithms
+            break
 
+#Mode = int(input('Select mode:\n1-Trial\n2-Experiment\n'))
 #Listy na kompletne listy z liczbami zamiast zmiennej
 new_points_normal = []
 new_points_transposed = []
 
-
 problem_amount = 0
 solution_amount = 0
 trial_amount = int(input('How many test cases?: '))
-algorithm = int(input('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n4-SA\n5-GA\n'))
-if(algorithm == 4):
+print('Select algorithm:\n1-Bruteforce\n2-Climbing\n3-Taboo Search\n4-SA\n5-GA\n')
+algorithm = pick_algorithms()
+if(len(algorithm) == 0):
+    sys.exit()
+if(4 in algorithm):
     first_temp = int(input('Input the first temperature:\n'))
-if(algorithm == 5):
+if(5 in algorithm):
     generation_size = int(input('Insert generation size: '))
     mating_pool_size = int(input('Declare mating pool: '))
     crossover_probability = float(input('Insert crossover probability from 0.01 to 1.00: '))
     mutation_probability = float(input('Insert mutation probability from 0.01 to 1.00: '))
-if(algorithm in [2,3,4,5]):
-    amount_of_iterations = int(input('How many iterations do you want?:\n'))
+    amount_of_iterations = int(input('How many iterations do you want? (amount_of_generated_elements):\n'))
 source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
 random_decision = int(input('Select mode:\n1-Manual\n2-Random\n'))
 if(random_decision == 1):
@@ -501,7 +550,7 @@ points_from_txt = []
 
 amount_of_elements = len(points_v2)*len(points_v2)
 
-def trial(trial_amount, problem_amount):
+def trial(trial_amount, problem_amount,option):
     interval_sum = 0
     score_sum = 0
     i = 1
@@ -521,17 +570,18 @@ def trial(trial_amount, problem_amount):
             text_file.write(str(row) + '\n')
         text_file.write('\n')
         #######FROM HERE ONWARD BRUTEFORCE############
-        if(algorithm == 1):
+        if(option == 1):
             final_outcome = complete_bruteforce(points_v2_normal,problem_amount)
-        elif(algorithm == 2):
-            final_outcome = climbing(points_v2_normal,amount_of_iterations)
-        elif(algorithm == 3):
-            final_outcome = taboo(points_v2_normal,amount_of_iterations)
-        elif(algorithm == 4):
-            final_outcome = SA(points_v2_normal,first_temp,amount_of_iterations)
-        elif(algorithm == 5):
+        elif(option == 2):
+            final_outcome = climbing(points_v2_normal)
+        elif(option == 3):
+            final_outcome = taboo(points_v2_normal)
+        elif(option == 4):
+            final_outcome = SA(points_v2_normal,first_temp)
+        elif(option == 5):
             final_outcome = Genetic(points_v2_normal,generation_size,mating_pool_size,amount_of_iterations,crossover_probability,mutation_probability)
         score = solution_t(final_outcome,problem_amount)
+        score = score/(amount_of_elements*2)
         after = datetime.now()
         interval = after - before
         if(type(interval_sum) == int):
@@ -547,9 +597,8 @@ def trial(trial_amount, problem_amount):
             text_file.write(str(row) + '\n')
         text_file.write('Time: ' + str(interval) + '\nScore: ' + str(round(score,0)) + '%\n')
         text_file.write('\n--------------------------------------------------------\n\n')
-        
         print(interval)
-        print(score/(amount_of_elements*2))
+        print(score)
         print(i)
         i = i + 1
     Avg_score = round((score_sum/trial_amount),2)
@@ -557,8 +606,274 @@ def trial(trial_amount, problem_amount):
     text_file.write('Total time: ' + str(interval_sum) + '\nAverage time: ' + str(Avg_time) + '\nAverage score: ' + str(Avg_score) + '%\n\n')
     text_file.close()
     print(interval_sum)
+    return interval_sum, Avg_time, Avg_score
 
-trial(trial_amount,problem_amount)
+def trial_v2(trial_amount, problem_amount,option):
+    interval_sum = 0
+    score_sum = 0
+    i = 1
+    if(source == 1):
+        load_from_file()
+        #points_v2 = points_from_txt
+    for each in range(0, trial_amount):
+        before = datetime.now()
+        points_v2_normal = copy.deepcopy(points_v2)
+        problem(problem_amount,points_v2_normal)
+        #points_v2_climbing = copy.deepcopy(points_v2_normal) # zbędna linia bo tylko kopiuje referencje i puszczam jeden algorytm naraz
+        #######FROM HERE ONWARD BRUTEFORCE############
+        if(option == 1):
+            final_outcome = complete_bruteforce(points_v2_normal,problem_amount)
+        elif(option == 2):
+            final_outcome = climbing(points_v2_normal)
+        elif(option == 3):
+            final_outcome = taboo(points_v2_normal)
+        elif(option == 4):
+            final_outcome = SA(points_v2_normal,first_temp)
+        elif(option == 5):
+            final_outcome = Genetic(points_v2_normal,generation_size,mating_pool_size,amount_of_iterations,crossover_probability,mutation_probability)
+        score = solution_t(final_outcome,problem_amount)
+        score = score/(amount_of_elements*2)
+        after = datetime.now()
+        interval = after - before
+        if(type(interval_sum) == int):
+            interval_sum = interval
+        else:
+            interval_sum = interval_sum + interval
+        if(score_sum == 0):
+            score_sum = score
+        else:
+            score_sum = score_sum + score
+        i = i + 1
+    Avg_score = round((score_sum/trial_amount)*100,2)
+    Avg_time = (interval_sum/trial_amount)
+    return interval_sum, Avg_time, Avg_score
+
+##########HERE GOES TRIAL BUT WITH MORE PROBLEMS##############
+def final_go():
+    Outcomes = []
+    text_file = open('Result.txt', 'w')
+    algorithm_name = None
+    for each in algorithm:
+        print(each)
+        if(each == 1):
+            algorithm_name = 'Bruteforce'
+        elif(each == 2):
+            algorithm_name = 'Hillclimb'
+        elif(each == 3):
+            algorithm_name = 'Tabu search'
+        elif(each == 4):
+            algorithm_name = 'SA'
+        elif(each == 5):
+            algorithm_name = 'Genetic algorithm'
+        total_time, avg_time, avg_score = trial_v2(trial_amount,problem_amount,each)
+        print(total_time)
+        print(avg_time)
+        print(avg_score)
+        text_file.write('Algorithm: ' + str(algorithm_name) + '\n' + 'Total time: ' + str(total_time) + '\nAverage time: ' + str(avg_time) + '\nAverage score: ' + str(avg_score) + '%\n\n')
+        x = [algorithm_name,str(total_time),str(avg_time),avg_score]
+        Outcomes.append(x)
+        total_time = None
+        avg_time = None
+        avg_score = None
+    text_file.close()
+    #return Outcomes
+    graph = input('Do you want to see a bar chart? Y/N: \n')
+    if(graph.upper() =='Y'):
+        present_outcome_v2(Outcomes)
+    else:
+        sys.exit()
+
+def time_converter(time):
+    time = time * (10 ** -6)
+    return time
+
+def present_outcome_v2(outcomes):
+    N = 2
+
+    data_bruteforce = None
+    data_hillclimbing = None
+    data_tabu = None
+    data_SA = None
+    data_GA = None
+
+    combined_timestamps = []
+    for result in outcomes:
+        stand_in = matplotlib.dates.datestr2num(result[1])
+        stand_in = time_converter(stand_in)
+        combined_timestamps.append(stand_in)
+    print(combined_timestamps)
+
+    avg_timestamps = []
+    for result in outcomes:
+        stand_in_avg = matplotlib.dates.datestr2num(result[2])
+        stand_in = time_converter(stand_in_avg)
+        avg_timestamps.append(stand_in_avg)
+    print(avg_timestamps)
+
+    all_scores = []
+    for result in outcomes:
+        all_scores.append(result[3])
+    print(all_scores)
+
+    algorithms_names = []
+
+    for result in outcomes:
+        if(result[0] == 'Bruteforce'):
+            algorithms_names.append(result[0])
+        elif(result[0] == 'Hillclimb'):
+            algorithms_names.append(result[0])
+        elif(result[0] == 'Tabu search'):
+            algorithms_names.append(result[0])
+        elif(result[0] == 'SA'):
+            algorithms_names.append(result[0])
+        elif(result[0] == 'Genetic algorithm'):
+            algorithms_names.append(result[0])
+
+    objects = tuple(algorithms_names)
+    y_pos = np.arange(len(outcomes))
+    
+    plt.bar(y_pos, tuple(all_scores), align='center', alpha=0.8)
+    plt.xticks(y_pos, objects)
+    plt.ylabel('Average score in %')
+    plt.title('Total time per algorithm')
+    
+    plt.show()
+
+    plt.bar(y_pos, tuple(combined_timestamps), align='center', alpha=0.8)
+    plt.xticks(y_pos, objects)
+    plt.ylabel('Total time in seconds')
+    plt.title('Total time per algorithm')
+    
+    plt.show()
+
+    plt.bar(y_pos, tuple(avg_timestamps), align='center', alpha=0.8)
+    plt.xticks(y_pos, objects)
+    plt.ylabel('Average time in seconds')
+    plt.title('Total time per algorithm')
+    
+    plt.show()
+
+   # #####DANE TUTAJ########
+#
+   # for result in outcomes:
+   #     if(result[0] == 'Bruteforce'):
+   #         temp_bf = matplotlib.dates.date2num(result[1:3])
+   #         data_bruteforce = tuple(result[1:3])
+   #     elif(result[0] == 'Hillclimb'):
+   #         temp_hc = matplotlib.dates.date2num(result[1:3])
+   #         data_hillclimbing = tuple(temp_hc)
+   #     elif(result[0] == 'Tabu search'):
+   #         temp_tb = matplotlib.dates.date2num(result[1:3])
+   #         data_tabu = tuple(temp_tb)
+   #     elif(result[0] == 'SA'):
+   #         temp_sa = matplotlib.dates.date2num(result[1:3])
+   #         data_SA = tuple(temp_sa)
+   #     elif(result[0] == 'Genetic algorithm'):
+   #         temp_ga = matplotlib.dates.date2num(result[1:3])
+   #         data_GA = tuple(temp_ga)
+#
+   # means_frank = (0.1,0.6)
+   # means_guido = (1,5)
+#
+   # print(data_bruteforce)
+   # print(data_hillclimbing)
+   # print(data_tabu)
+   # print(data_SA)
+   # print(data_GA)
+   # #######################
+#
+   # fig, ax = plt.subplots()
+   # index = np.arange(N)
+   # bar_width = 0.01
+   # opacity = 0.8
+#
+   # rects1 = plt.bar(index, data_bruteforce, bar_width,alpha=opacity,color='b',label='Bruteforce')
+#
+   # rects2 = plt.bar(index + bar_width, data_hillclimbing, bar_width,alpha=opacity,color='g',label='Hillclimb')
+#
+   # rects3 = plt.bar(index + bar_width*2, data_tabu, bar_width,alpha=opacity,color='r',label='Tabu')
+#
+   # plt.xlabel('Data')
+   # plt.ylabel('Time')
+   # plt.title('Time by algorithm')
+   # plt.xticks(index + bar_width, ('Total time', 'Average time'))
+   # plt.legend()
+#
+   # plt.tight_layout()
+   # plt.show()
+
+#def present_outcome(outcomes):
+#
+#    i = 0
+#    N = len(outcomes)
+#    ind = np.arange(N)
+#    width = 0.2
+#    colors = ['r','g','b','y','o']
+#
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111)
+#
+#    rects = []
+#    legend = []
+#    for result in outcomes:
+#        print(outcomes)
+#        print(result)
+#        if(i == 0):
+#            avals = result[1:3]
+#            rects1 = ax.bar(ind+(width*(i)), avals, width, color=colors[i])
+#            rects.append(rects1[0])
+#            legend.append(result[0])
+#        if(i == 1):
+#            bvals = result[1:3]
+#            rects1 = ax.bar(ind+(width*(i)), bvals, width, color=colors[i])
+#            rects.append(rects1[0])
+#            legend.append(result[0])
+#        if(i == 2):
+#            cvals = result[1:3]
+#            rects1 = ax.bar(ind+(width*(i)), cvals, width, color=colors[i])
+#            rects.append(rects1[0])
+#            legend.append(result[0])
+#        if(i == 3):
+#            dvals = result[1:3]
+#            rects1 = ax.bar(ind+(width*(i)), dvals, width, color=colors[i])
+#            rects.append(rects1[0])
+#            legend.append(result[0])
+#        if(i == 4):
+#            evals = result[1:3]
+#            rects1 = ax.bar(ind+(width*(i)), evals, width, color=colors[i])
+#            rects.append(rects1[0])
+#            legend.append(result[0])
+#        i = i + 1
+#    rects_tup = tuple(rects)
+#    legend = tuple(legend)
+#
+#    xlabels = []
+#    for result in outcomes:
+#        xlabels.append(result[0])
+#    xlabels = tuple(xlabels)
+#
+#    ax.set_ylabel('Outcome')
+#    ax.set_xticks(ind+width)
+#    ax.set_xticklabels( xlabels )
+#    ax.legend( rects_tup, legend )
+#
+#    def autolabel(rects):
+#        for rect in rects_tup:
+#            h = rect.get_height()
+#            ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h), ha='center', va='bottom')
+#
+#    for each in rects:
+#        autolabel(each)
+#
+#    plt.show()
+
+final_go()
+
+#Mode = int(input('1-Normal\n2-Experiment\n'))
+#if(Mode == 1):
+#    trial(trial_amount,problem_amount)
+#elif(Mode == 2):
+    
 #print(outcome_final)
 
 
