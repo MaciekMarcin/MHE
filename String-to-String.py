@@ -559,7 +559,7 @@ if(5 in algorithm):
     crossover_probability = float(input('Insert crossover probability from 0.01 to 1.00: '))
     mutation_probability = float(input('Insert mutation probability from 0.01 to 1.00: '))
     amount_of_iterations = int(input('How many iterations do you want? (amount_of_generated_elements):\n'))
-source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
+#source = int(input('Select data source:\n1-From txt file\n2-Default source data\n'))
 random_decision = int(input('Select mode:\n1-Manual\n2-Random\n'))
 if(random_decision == 1):
     size = int(input('Input number (not applicable if you want input from file): '))
@@ -580,9 +580,9 @@ def trial(trial_amount, problem_amount,option):
     interval_sum = 0
     score_sum = 0
     i = 1
-    if(source == 1):
-        load_from_file()
-        #points_v2 = points_from_txt
+    #if(source == 1):
+    #    load_from_file()
+    #    #points_v2 = points_from_txt
     text_file = open('Result.txt', 'w')
     
     for each in range(0, trial_amount):
@@ -638,9 +638,9 @@ def trial_v2(trial_amount, problem_amount,option):
     interval_sum = 0
     score_sum = 0
     i = 1
-    if(source == 1):
-        load_from_file()
-        #points_v2 = points_from_txt
+    #if(source == 1):
+    #    load_from_file()
+    #    #points_v2 = points_from_txt
     for each in range(0, trial_amount):
         before = datetime.now()
         points_v2_normal = copy.deepcopy(points_v2)
