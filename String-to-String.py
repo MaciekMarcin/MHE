@@ -224,6 +224,17 @@ def taboo(points_v3):
     #    taboo(retry_list,amount_of_generated_elements)
     #else:
     print('final list ' + str(points_v2_normal)) #print final list
+
+    ###########HYBRID BUILD START HERE#################
+    x_final_counter = 0
+    for points in points_v2_normal:
+        for point in points:
+            if(point == 'x'):
+                x_final_counter = x_final_counter + 1
+    if(x_final_counter > 0):
+        points_v2_normal = climbing(points_v2_normal)
+    ############HYBRID BUILD END HERE###################
+
     return points_v2_normal
 
 
@@ -266,11 +277,14 @@ def SA(points_v2_normal,first_temperature):
                         counter = abs(score-final_point_score)
                         temperature = first_temperature/each
                         inside = counter/temperature
-                        whole = math.exp(inside)
+                        whole = math.exp(-inside)
                         if(U < whole):
                             final_point_score = score
                             final_point = int(i)
-                    ###TUTDAJ DODAC ELSE I RESZTE ALGORYTMU
+                        #else:
+                        #    final_point_score = final_point_score
+                        #    final_point = final_point
+
                     if(each == len(points)):
                         points_v2_normal[points_v2_normal.index(points)][points.index(point)] = final_point
     print(points_v2_normal)
@@ -285,11 +299,11 @@ def fitness(points_v2_score):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                i = i - 2
+                i = i# - 2
             elif(points.count(point) == 1):
                 i = i + 1
             else:
-                i = i - 1# + 0.25
+                i = i# - 1# + 0.25
     points_v2_transposed = np.transpose(points_v2_score)
     points_v2_transposed = points_v2_transposed.tolist()
     print(points_v2_transposed)
@@ -297,11 +311,11 @@ def fitness(points_v2_score):
         for point in points:
             elements = len(points)
             if(point == 'x'):
-                j = j - 2
+                j = j# - 2
             elif(points.count(point) == 1):
                 j = j + 1
             else:   
-                j = j - 1# + 0.25
+                j = j# - 1# + 0.25
     score = (i + j)/(2*(len(points_v2_score)*len(points_v2_score)))
     return score
 
@@ -331,6 +345,13 @@ def crossover_probability(a, b, probability):
             print('test')
 
     return new_member_a, new_member_b
+
+def crossover_2nd_degree(parent_1, parent_2):
+    crossover_index = random.randrange(1, round(len(parent_1)/2,0))
+    crossover_index_2 = random.randrange(crossover_index + 1, len(parent_1))
+    child_1 = parent_1[:crossover_index] + parent_2[crossover_index:]
+    child_2 = parent_2[:crossover_index] + parent_1[crossover_index:]
+    return child_1, child_2
 
 def crossover_simple(parent_1, parent_2):
     crossover_index = random.randrange(1, len(parent_1))
@@ -396,7 +417,12 @@ def Genetic(points_v2_normal,generation_size,mating_pool_size,iterations,cs_prob
             crossover_population.append(element)
             before_crossover.remove(element)
             for parent in before_crossover:
-                a, b = crossover_simple(element,parent)                
+                chance = random.random()
+                if(chance < 0.5):
+                    a, b = crossover_2nd_degree(element,parent)
+                else:
+                    a, b = crossover_simple(element,parent)
+                #a, b = crossover_probability(element,parent,cs_probability_percent)                
                 crossover_generation.append(a)
                 crossover_generation.append(b)
         print('After: ' + str(crossover_generation))
@@ -581,7 +607,7 @@ def trial(trial_amount, problem_amount,option):
         elif(option == 5):
             final_outcome = Genetic(points_v2_normal,generation_size,mating_pool_size,amount_of_iterations,crossover_probability,mutation_probability)
         score = solution_t(final_outcome,problem_amount)
-        score = score/(amount_of_elements*2)
+        score = (score-problem_amount)/((amount_of_elements-problem_amount)*2)
         after = datetime.now()
         interval = after - before
         if(type(interval_sum) == int):
@@ -706,7 +732,7 @@ def present_outcome_v2(outcomes):
     avg_timestamps = []
     for result in outcomes:
         stand_in_avg = matplotlib.dates.datestr2num(result[2])
-        stand_in = time_converter(stand_in_avg)
+        stand_in_avg = time_converter(stand_in_avg)
         avg_timestamps.append(stand_in_avg)
     print(avg_timestamps)
 
@@ -735,7 +761,7 @@ def present_outcome_v2(outcomes):
     plt.bar(y_pos, tuple(all_scores), align='center', alpha=0.8)
     plt.xticks(y_pos, objects)
     plt.ylabel('Average score in %')
-    plt.title('Total time per algorithm')
+    plt.title('Average score per algorithm')
     
     plt.show()
 
@@ -749,131 +775,9 @@ def present_outcome_v2(outcomes):
     plt.bar(y_pos, tuple(avg_timestamps), align='center', alpha=0.8)
     plt.xticks(y_pos, objects)
     plt.ylabel('Average time in seconds')
-    plt.title('Total time per algorithm')
+    plt.title('Average time per algorithm')
     
     plt.show()
 
-   # #####DANE TUTAJ########
-#
-   # for result in outcomes:
-   #     if(result[0] == 'Bruteforce'):
-   #         temp_bf = matplotlib.dates.date2num(result[1:3])
-   #         data_bruteforce = tuple(result[1:3])
-   #     elif(result[0] == 'Hillclimb'):
-   #         temp_hc = matplotlib.dates.date2num(result[1:3])
-   #         data_hillclimbing = tuple(temp_hc)
-   #     elif(result[0] == 'Tabu search'):
-   #         temp_tb = matplotlib.dates.date2num(result[1:3])
-   #         data_tabu = tuple(temp_tb)
-   #     elif(result[0] == 'SA'):
-   #         temp_sa = matplotlib.dates.date2num(result[1:3])
-   #         data_SA = tuple(temp_sa)
-   #     elif(result[0] == 'Genetic algorithm'):
-   #         temp_ga = matplotlib.dates.date2num(result[1:3])
-   #         data_GA = tuple(temp_ga)
-#
-   # means_frank = (0.1,0.6)
-   # means_guido = (1,5)
-#
-   # print(data_bruteforce)
-   # print(data_hillclimbing)
-   # print(data_tabu)
-   # print(data_SA)
-   # print(data_GA)
-   # #######################
-#
-   # fig, ax = plt.subplots()
-   # index = np.arange(N)
-   # bar_width = 0.01
-   # opacity = 0.8
-#
-   # rects1 = plt.bar(index, data_bruteforce, bar_width,alpha=opacity,color='b',label='Bruteforce')
-#
-   # rects2 = plt.bar(index + bar_width, data_hillclimbing, bar_width,alpha=opacity,color='g',label='Hillclimb')
-#
-   # rects3 = plt.bar(index + bar_width*2, data_tabu, bar_width,alpha=opacity,color='r',label='Tabu')
-#
-   # plt.xlabel('Data')
-   # plt.ylabel('Time')
-   # plt.title('Time by algorithm')
-   # plt.xticks(index + bar_width, ('Total time', 'Average time'))
-   # plt.legend()
-#
-   # plt.tight_layout()
-   # plt.show()
-
-#def present_outcome(outcomes):
-#
-#    i = 0
-#    N = len(outcomes)
-#    ind = np.arange(N)
-#    width = 0.2
-#    colors = ['r','g','b','y','o']
-#
-#    fig = plt.figure()
-#    ax = fig.add_subplot(111)
-#
-#    rects = []
-#    legend = []
-#    for result in outcomes:
-#        print(outcomes)
-#        print(result)
-#        if(i == 0):
-#            avals = result[1:3]
-#            rects1 = ax.bar(ind+(width*(i)), avals, width, color=colors[i])
-#            rects.append(rects1[0])
-#            legend.append(result[0])
-#        if(i == 1):
-#            bvals = result[1:3]
-#            rects1 = ax.bar(ind+(width*(i)), bvals, width, color=colors[i])
-#            rects.append(rects1[0])
-#            legend.append(result[0])
-#        if(i == 2):
-#            cvals = result[1:3]
-#            rects1 = ax.bar(ind+(width*(i)), cvals, width, color=colors[i])
-#            rects.append(rects1[0])
-#            legend.append(result[0])
-#        if(i == 3):
-#            dvals = result[1:3]
-#            rects1 = ax.bar(ind+(width*(i)), dvals, width, color=colors[i])
-#            rects.append(rects1[0])
-#            legend.append(result[0])
-#        if(i == 4):
-#            evals = result[1:3]
-#            rects1 = ax.bar(ind+(width*(i)), evals, width, color=colors[i])
-#            rects.append(rects1[0])
-#            legend.append(result[0])
-#        i = i + 1
-#    rects_tup = tuple(rects)
-#    legend = tuple(legend)
-#
-#    xlabels = []
-#    for result in outcomes:
-#        xlabels.append(result[0])
-#    xlabels = tuple(xlabels)
-#
-#    ax.set_ylabel('Outcome')
-#    ax.set_xticks(ind+width)
-#    ax.set_xticklabels( xlabels )
-#    ax.legend( rects_tup, legend )
-#
-#    def autolabel(rects):
-#        for rect in rects_tup:
-#            h = rect.get_height()
-#            ax.text(rect.get_x()+rect.get_width()/2., 1.05*h, '%d'%int(h), ha='center', va='bottom')
-#
-#    for each in rects:
-#        autolabel(each)
-#
-#    plt.show()
-
 final_go()
-
-#Mode = int(input('1-Normal\n2-Experiment\n'))
-#if(Mode == 1):
-#    trial(trial_amount,problem_amount)
-#elif(Mode == 2):
-    
-#print(outcome_final)
-
 
