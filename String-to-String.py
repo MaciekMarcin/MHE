@@ -113,9 +113,9 @@ def bruteforce_hard_way(points_v2_normal, problem_amount):
 def complete_bruteforce(points_v2_normal, problem_amount):
     easy_bruteforce = solution_v2(points_v2_normal)
     easy_bruteforce_score = solution_t(easy_bruteforce, problem_amount)
-    if(easy_bruteforce_score < 1):
-        hard_way_score = bruteforce_hard_way(points_v2_normal, problem_amount)
-        return hard_way_score
+    #if(easy_bruteforce_score < 1):
+    #    hard_way_score = bruteforce_hard_way(points_v2_normal, problem_amount)
+    #    return hard_way_score
     return easy_bruteforce
     
 
@@ -236,6 +236,44 @@ def taboo(points_v3):
     ############HYBRID BUILD END HERE###################
 
     return points_v2_normal
+
+
+def taboo_v2(points_v2_climbing):
+    ####DODAC LOSOWANIE ELEMENTU EACH##########
+    outcome = []
+    for points in points_v2_climbing:
+        for point in points:
+            tabu_list = []
+            #print(point)
+            if(point == 'x'):
+                test_list = copy.deepcopy(points_v2_climbing)
+                #test_list[test_list.index(points)][points.index(point)] = len(points)
+                final_point_score = solution_t(test_list,problem_amount)
+                final_point = None
+                print('Final point score: ' + str(final_point_score))
+                random_elements = []
+                #for g in range(1,21):
+                    #random_elements.append(random.randint())
+                T = 31
+                for each in range(1,T):
+                    i = random.randint(1,len(points_v2_climbing))
+                    print('i: ' + str(i))
+                    test_list = copy.deepcopy(points_v2_climbing)
+                    loop_list = copy.deepcopy(points_v2_climbing) #jedyna opcja działająca kopiowania listy
+                    #Trzeba pracować na kopii listy niż na oryginale
+                    loop_list[loop_list.index(points)][points.index(point)] = i
+                    score = solution_t(loop_list,problem_amount)
+                    print('score of point: ' + str(score))
+                    if(loop_list not in tabu_list):
+                        final_point_score = score
+                        final_point = int(i)
+                    else:
+                        tabu_list.append(loop_list)
+                    if(each == T-1):
+                        points_v2_climbing[points_v2_climbing.index(points)][points.index(point)] = final_point
+    print('final list: ' + str(points_v2_climbing)) #print final list
+    return points_v2_climbing
+
 
 
 def SA(points_v2_normal,first_temperature):
@@ -390,6 +428,13 @@ def score_generation(population):
     scores.sort(key=lambda sublist: sublist[0], reverse=True)
     return scores
 
+def check_population(population,generation_size,problem_square):
+    if(len(population) < generation_size):
+        while(len(population) < generation_size):
+            population.append(create_population(problem_square))
+    return population
+
+
 
 def Genetic(points_v2_normal,generation_size,mating_pool_size,iterations,cs_probability_percent,mutation_probability):
     population = create_generation(points_v2_normal,generation_size)
@@ -437,9 +482,10 @@ def Genetic(points_v2_normal,generation_size,mating_pool_size,iterations,cs_prob
         if(best_candidate[0] == 1):
             iterations = 0
         scores_iteration = []
-        population = population_mutated
-        iterations = iterations - 1
+        population_elite = population_mutated
         print('Best: ' + str(best_candidate[1]))
+        population = check_population(population_elite,generation_size,points_v2_normal)
+        iterations = iterations - 1
     return best_candidate[1]
 
 
@@ -652,7 +698,8 @@ def trial_v2(trial_amount, problem_amount,option):
         elif(option == 2):
             final_outcome = climbing(points_v2_normal)
         elif(option == 3):
-            final_outcome = taboo(points_v2_normal)
+            #final_outcome = taboo(points_v2_normal)
+            final_outcome = taboo_v2(points_v2_normal)
         elif(option == 4):
             final_outcome = SA(points_v2_normal,first_temp)
         elif(option == 5):
@@ -680,6 +727,9 @@ def final_go():
     text_file = open('Result.txt', 'w')
     algorithm_name = None
     for each in algorithm:
+        total_time = None
+        avg_time = None
+        avg_score = None
         print(each)
         if(each == 1):
             algorithm_name = 'Bruteforce'
@@ -698,11 +748,8 @@ def final_go():
         for row in best_candidate:
             text_file.write(str(row) + '\n')
         text_file.write('Algorithm: ' + str(algorithm_name) + '\n' + 'Total time: ' + str(total_time) + '\nAverage time: ' + str(avg_time) + '\nAverage score: ' + str(avg_score) + '%\n\n')
-        x = [algorithm_name,str(total_time),str(avg_time),avg_score]
+        x = [algorithm_name,total_time,avg_time,avg_score]
         Outcomes.append(x)
-        total_time = None
-        avg_time = None
-        avg_score = None
     text_file.close()
     #return Outcomes
     graph = input('Do you want to see a bar chart? Y/N: \n')
@@ -714,7 +761,7 @@ def final_go():
 def time_converter(time):
     time = time * (10 ** -6)
     return time
-
+import datetime as dt
 def present_outcome_v2(outcomes):
     N = 2
 
@@ -726,15 +773,23 @@ def present_outcome_v2(outcomes):
 
     combined_timestamps = []
     for result in outcomes:
-        stand_in = matplotlib.dates.datestr2num(result[1])
-        stand_in = time_converter(stand_in)
+        print(result)
+        stand_in = result[1]
+        #after_point = stand_in[-6:]
+        #seconds = stand_in[-9:-7]
+        #miliseconds = int(seconds)*1000000+int(after_point)
+        stand_in = dt.timedelta.total_seconds(stand_in)
         combined_timestamps.append(stand_in)
+        print('Comb ' + str(combined_timestamps))
     print(combined_timestamps)
 
     avg_timestamps = []
     for result in outcomes:
-        stand_in_avg = matplotlib.dates.datestr2num(result[2])
-        stand_in_avg = time_converter(stand_in_avg)
+        stand_in_avg = result[2]
+        #after_point = stand_in_avg[-6:]
+        #seconds = stand_in_avg[-9:-7]
+        #miliseconds = int(seconds)*1000000+int(after_point)
+        stand_in_avg = dt.timedelta.total_seconds(stand_in_avg)
         avg_timestamps.append(stand_in_avg)
     print(avg_timestamps)
 
