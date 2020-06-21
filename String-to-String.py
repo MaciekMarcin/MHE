@@ -672,7 +672,7 @@ def trial_v2(trial_amount, problem_amount,option):
         i = i + 1
     Avg_score = round((score_sum/trial_amount)*100,2)
     Avg_time = (interval_sum/trial_amount)
-    return interval_sum, Avg_time, Avg_score
+    return interval_sum, Avg_time, Avg_score, final_outcome
 
 ##########HERE GOES TRIAL BUT WITH MORE PROBLEMS##############
 def final_go():
@@ -691,10 +691,12 @@ def final_go():
             algorithm_name = 'SA'
         elif(each == 5):
             algorithm_name = 'Genetic algorithm'
-        total_time, avg_time, avg_score = trial_v2(trial_amount,problem_amount,each)
+        total_time, avg_time, avg_score, best_candidate = trial_v2(trial_amount,problem_amount,each)
         print(total_time)
         print(avg_time)
         print(avg_score)
+        for row in best_candidate:
+            text_file.write(str(row) + '\n')
         text_file.write('Algorithm: ' + str(algorithm_name) + '\n' + 'Total time: ' + str(total_time) + '\nAverage time: ' + str(avg_time) + '\nAverage score: ' + str(avg_score) + '%\n\n')
         x = [algorithm_name,str(total_time),str(avg_time),avg_score]
         Outcomes.append(x)
